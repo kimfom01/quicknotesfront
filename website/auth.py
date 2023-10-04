@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from .models import User
-from . import db
+from . import db, oauth
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 
@@ -35,6 +35,7 @@ def login():
 @auth.route("/logout")
 @login_required
 def logout():
+    session.clear()
     logout_user()
     return redirect(url_for("auth.login"))
 
@@ -68,3 +69,30 @@ def sign_up():
             flash("Account created!", category="success")
             return redirect(url_for("views.home"))
     return render_template("sign_up.html", user=current_user)
+
+
+@auth.route("/google-signin")
+def google_signin():
+    return oauth.notes_app.authorize_redirect(url_for("auth.callback_url", _external=True))
+
+
+@auth.route("/authCallback")
+def callback_url():
+    token = oauth.notes_app.authorize_access_token()
+    session["user"] = token
+    user_info = session["user"].get("userinfo")
+    email = user_info.get("email")
+
+    user = User.query.filter_by(email=email).first()
+
+    if user:
+        login_user(user)
+        flash("Logged in successfully!", category="success")
+        return redirect(url_for("views.home"))
+    else:
+        google_user = User(first_name=user_info.get("given_name"), email=email)
+        db.session.add(google_user)
+        db.session.commit()
+        flash("Account created!", category="success")
+        login_user(google_user)
+        return redirect(url_for("views.home"))
