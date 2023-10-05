@@ -1,4 +1,4 @@
-# Notes App
+# Quick Notes
 
 ## Some dependencies
 
