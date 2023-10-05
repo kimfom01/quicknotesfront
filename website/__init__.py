@@ -1,19 +1,23 @@
 from flask import Flask
 from authlib.integrations.flask_client import OAuth
 from flask_sqlalchemy import SQLAlchemy
-from os import path
+from os import path, getenv
 from flask_login import LoginManager
+from dotenv import load_dotenv
 
 db = SQLAlchemy()
 
+load_dotenv()
+
 app_config = {
-    "OAUTH2_CLIENT_ID": "get client id from google console",
-    "OAUTH2_CLIENT_SECRET": "get client secret from google console",
-    "OAUTH2_META_URL": "https://accounts.google.com/.well-known/openid-configuration",
-    "FLASK_SECRET": "my super secure sexy secret key",
-    "FLASK_PORT": 5000,
-    "DB_NAME": "database.db"
+    "OAUTH2_CLIENT_ID": getenv("OAUTH2_CLIENT_ID"),
+    "OAUTH2_CLIENT_SECRET": getenv("OAUTH2_CLIENT_SECRET"),
+    "OAUTH2_META_URL": getenv("OAUTH2_META_URL"),
+    "FLASK_SECRET": getenv("FLASK_SECRET"),
+    "DB_NAME": getenv("DB_NAME")
 }
+
+print(app_config)
 
 oauth = OAuth()
 
