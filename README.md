@@ -1,6 +1,7 @@
 # Notes App
 
-#### Some dependencies
+## Some dependencies
+
 - flask
 - Flask-SQLAlchemy
 - flask-login
