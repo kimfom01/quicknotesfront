@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path, getenv
 from flask_login import LoginManager
 from dotenv import load_dotenv
+from flask_migrate import Migrate
 
 db = SQLAlchemy()
 
@@ -14,10 +15,8 @@ app_config = {
     "OAUTH2_CLIENT_SECRET": getenv("OAUTH2_CLIENT_SECRET"),
     "OAUTH2_META_URL": getenv("OAUTH2_META_URL"),
     "FLASK_SECRET": getenv("FLASK_SECRET"),
-    "DB_NAME": getenv("DB_NAME")
+    "DB_URI": getenv("DB_URI")
 }
-
-print(app_config)
 
 oauth = OAuth()
 
@@ -33,7 +32,7 @@ oauth.register("notes_app",
 def create_app():
     app = Flask(__name__)
     app.config["SECRET_KEY"] = app_config.get("FLASK_SECRET")
-    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{app_config.get('DB_NAME')}"
+    app.config["SQLALCHEMY_DATABASE_URI"] = app_config.get('DB_URI')
 
     db.init_app(app)
 
@@ -45,7 +44,7 @@ def create_app():
 
     from .models import User, Note
 
-    create_database(app)
+    migrate = Migrate(app, db)
 
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
@@ -56,10 +55,3 @@ def create_app():
         return User.query.get((int(id)))
 
     return app
-
-
-def create_database(app):
-    if not path.exists("website/" + app_config.get('DB_NAME')):
-        with app.app_context():
-            db.create_all()
-            print("Created Database!")
