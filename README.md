@@ -7,3 +7,4 @@
 - flask-login
 - Authlib
 - requests
+- Gunicorn
