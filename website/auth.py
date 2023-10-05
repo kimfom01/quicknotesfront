@@ -21,6 +21,11 @@ def login():
             user = User.query.filter_by(email=email).first()
 
             if user:
+                if not user.password:
+                    flash("You do not have a password!", category="error")
+                    flash("Click Sign in with Google to continue",
+                          category="error")
+                    return render_template("login.html", user=current_user)
                 if check_password_hash(user.password, password):
                     flash("Logged in successfully!", category="success")
                     login_user(user, remember=True)
