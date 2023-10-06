@@ -9,7 +9,6 @@
 - requests
 - Gunicorn
 
-
 ## Run Migrations
 
 ```sh
@@ -18,6 +17,9 @@ flask db migrate
 flask db upgrade
 ```
 
+## Hosting
+
+- [Render](https://render.com/)
 
 ## Database Provider
 
