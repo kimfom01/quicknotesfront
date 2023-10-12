@@ -13,7 +13,7 @@ class User(db.Model, UserMixin):
 
 class Collection(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(150), unique=True)
+    title = db.Column(db.String(150))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     notes = db.relationship('Note')
 
