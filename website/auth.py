@@ -104,7 +104,8 @@ def callback_url():
         db.session.add(google_user)
         db.session.commit()
 
-        new_collection = Collection(title="Default", user_id=google_user.id)
+        new_collection = Collection(
+            title="Default Collection", user_id=google_user.id)
         db.session.add(new_collection)
         db.session.commit()
         flash("Account created!", category="success")
