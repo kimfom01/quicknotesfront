@@ -1,0 +1,27 @@
+@import url("https://fonts.googleapis.com/css2?family=Salsa&family=Shantell+Sans&display=swap");
+
+body {
+  font-family: "Salsa", "Shantell Sans", cursive;
+}
+
+.landing {
+  position: relative;
+  height: 94vh;
+  color: #fff;
+}
+
+.background-image {
+  width: 100%;
+  height: 100%;
+  filter: brightness(30%);
+  object-fit: cover;
+}
+
+.landing-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 120px;
+  text-shadow: #000 0 10px;
+  transform: translate(-50%, -50%);
+}
