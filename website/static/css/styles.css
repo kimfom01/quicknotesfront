@@ -25,3 +25,14 @@ body {
   text-shadow: #000 0 10px;
   transform: translate(-50%, -50%);
 }
+
+.call-to-action {
+  font-size: 50px;
+  text-shadow: none;
+}
+
+@media (max-width: 700px) {
+  .landing-message {
+    font-size: 60px;
+  }
+}
