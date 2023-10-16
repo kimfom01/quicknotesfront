@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 
 auth = Blueprint("auth", __name__)
+DEFAULT_COLLECTION = "Default Collection"
 
 
 @auth.route("/login", methods=["GET", "POST"])
@@ -72,7 +73,7 @@ def sign_up():
             db.session.commit()
 
             new_collection = Collection(
-                title="Default Collection", user_id=new_user.id)
+                title=DEFAULT_COLLECTION, user_id=new_user.id)
             db.session.add(new_collection)
             db.session.commit()
             flash("Account created!", category="success")
@@ -98,14 +99,16 @@ def callback_url():
     if user:
         login_user(user)
         flash("Logged in successfully!", category="success")
-        return redirect(url_for("notes.my_notes"))
+        default_collection = Collection.query.filter_by(
+            user_id=user.id, title=DEFAULT_COLLECTION).first()
+        return redirect(url_for("notes.my_notes", collection_id=default_collection.id))
     else:
         google_user = User(first_name=user_info.get("given_name"), email=email)
         db.session.add(google_user)
         db.session.commit()
 
         new_collection = Collection(
-            title="Default Collection", user_id=google_user.id)
+            title=DEFAULT_COLLECTION, user_id=google_user.id)
         db.session.add(new_collection)
         db.session.commit()
         flash("Account created!", category="success")
