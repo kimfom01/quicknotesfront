@@ -30,6 +30,9 @@ oauth.register("notes_app",
 
 
 def create_app():
+    """
+        Initialize app
+    """
     app = Flask(__name__)
     app.config["SECRET_KEY"] = app_config.get("FLASK_SECRET")
     app.config["SQLALCHEMY_DATABASE_URI"] = app_config.get('DB_URI')
@@ -44,16 +47,16 @@ def create_app():
     app.register_blueprint(auth, url_prefix="/")
     app.register_blueprint(notes, url_prefix="/")
 
-    from .models import User, Note
+    from .models import User
 
-    migrate = Migrate(app, db)
+    Migrate(app, db)
 
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
     login_manager.init_app(app)
 
     @login_manager.user_loader
-    def load_user(id):
+    def load_user(id: str) -> User | None:
         return User.query.get((int(id)))
 
     return app
