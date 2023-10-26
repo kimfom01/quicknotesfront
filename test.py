@@ -1,10 +1,12 @@
-import unittest
+def capital_case(x):
+    """
+        Capitalize the first letter of the word or sentence
+    """
+    return x.capitalize()
 
 
-class TestClass(unittest.TestCase):
-    def test_one(self):
-        self.assertEqual(1, 1)
-
-
-if __name__ == "__main__":
-    unittest.main()
+def test_capital_case():
+    """
+        test capital case
+    """
+    assert capital_case('semaphore') == 'Semaphore'
