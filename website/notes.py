@@ -1,7 +1,7 @@
+import json
 from flask import Blueprint, request, redirect, url_for, render_template, jsonify, flash
 from flask_login import login_required, current_user
 from .models import Note, Collection
-import json
 from . import db
 
 

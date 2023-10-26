@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session
-from .models import User, Collection
 from . import db, oauth
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
+from .models import User, Collection
 
 auth = Blueprint("auth", __name__)
 DEFAULT_COLLECTION = "Default Collection"

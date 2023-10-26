@@ -1,7 +1,7 @@
+from os import getenv
 from flask import Flask
 from authlib.integrations.flask_client import OAuth
 from flask_sqlalchemy import SQLAlchemy
-from os import path, getenv
 from flask_login import LoginManager
 from dotenv import load_dotenv
 from flask_migrate import Migrate
