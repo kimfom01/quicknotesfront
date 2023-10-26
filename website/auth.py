@@ -34,8 +34,7 @@ def login():
                     flash("Logged in successfully!", category="success")
                     login_user(user, remember=True)
                     return redirect(url_for("notes.my_notes"))
-                else:
-                    flash("Invalid email or password!", category="error")
+                flash("Invalid email or password!", category="error")
             else:
                 flash("User does not exist!", category="error")
     return render_template("login.html", user=current_user)
