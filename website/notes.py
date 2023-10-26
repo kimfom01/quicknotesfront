@@ -1,41 +1,46 @@
-from flask import Blueprint, request, redirect, url_for, render_template, jsonify, flash
+import json
+from flask import Blueprint, request, render_template, jsonify, flash
 from flask_login import login_required, current_user
 from .models import Note, Collection
-import json
 from . import db
 
 
 notes = Blueprint("notes", __name__)
 
 
-@notes.route("my-notes", methods=["GET", "POST"])
+@notes.route("my-notes", methods=["GET"])
 @login_required
 def my_notes():
+    """
+        Show list of notes
+    """
+
     collection_id = request.args.get("collection_id")
 
     collection = Collection.query.get(collection_id)
-    if request.method == "POST":
-        return redirect(url_for('views.new_note'))
+
     return render_template("my_notes.html", user=current_user, collection=collection)
 
 
-@notes.route("/my-collections", methods=["GET", "POST"])
+@notes.route("/my-collections", methods=["GET"])
 @login_required
 def my_collections():
+    """
+        Show collections
+    """
     collection_id = request.args.get("collection_id")
-    print(collection_id)
 
     collection = Collection.query.get(collection_id)
-    print(collection)
 
-    if request.method == "POST":
-        return redirect(url_for('views.new_note'))
     return render_template("my_collections.html", user=current_user, collection=collection)
 
 
 @notes.route("/new-note", methods=["GET", "POST"])
 @login_required
 def new_note():
+    """
+        Create new note
+    """
     collection_id = Collection.query.filter_by(
         user_id=current_user.id).first().id
     if request.method == "POST":
@@ -43,12 +48,11 @@ def new_note():
 
         if len(note) < 1:
             flash("Note is too short", category="error")
-
         else:
-            new_note = Note(data=note, user_id=current_user.id,
-                            collection_id=collection_id)
+            created_note = Note(data=note, user_id=current_user.id,
+                                collection_id=collection_id)
 
-            db.session.add(new_note)
+            db.session.add(created_note)
             db.session.commit()
             flash("Note saved!", category="success")
     return render_template("new_note.html", user=current_user)
@@ -57,10 +61,13 @@ def new_note():
 @notes.route("/delete-note", methods=["POST"])
 @login_required
 def delete_note():
+    """
+        Delete existing note api endpoint
+    """
     data = json.loads(request.data)
-    noteId = data["noteId"]
+    note_id = data["noteId"]
 
-    note = Note.query.get(noteId)
+    note = Note.query.get(note_id)
 
     if note:
         if note.user_id == current_user.id:
