@@ -11,7 +11,7 @@ DEFAULT_COLLECTION = "Default Collection"
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     """
-        Login user with form    
+    Login user with form
     """
     if request.method == "POST":
         email = request.form.get("email")
@@ -27,8 +27,7 @@ def login():
             if user:
                 if not user.password:
                     flash("You do not have a password!", category="error")
-                    flash("Click Sign in with Google to continue",
-                          category="error")
+                    flash("Click Sign in with Google to continue", category="error")
                     return render_template("login.html", user=current_user)
                 if check_password_hash(user.password, password):
                     flash("Logged in successfully!", category="success")
@@ -44,8 +43,8 @@ def login():
 @login_required
 def logout():
     """
-        Logs the user out of the application.
-        Clears user session
+    Logs the user out of the application.
+    Clears user session
     """
     session.clear()
     logout_user()
@@ -55,7 +54,7 @@ def logout():
 @auth.route("/sign-up", methods=["GET", "POST"])
 def sign_up():
     """
-        Sign up with form    
+    Sign up with form
     """
     if request.method == "POST":
         email = request.form.get("email")
@@ -76,13 +75,11 @@ def sign_up():
             flash("Password and Confirm Password must match", category="error")
         else:
             password_hash = generate_password_hash(password1, method="sha256")
-            new_user = User(email=email, first_name=first_name,
-                            password=password_hash)
+            new_user = User(email=email, first_name=first_name, password=password_hash)
             db.session.add(new_user)
             db.session.commit()
 
-            new_collection = Collection(
-                title=DEFAULT_COLLECTION, user_id=new_user.id)
+            new_collection = Collection(title=DEFAULT_COLLECTION, user_id=new_user.id)
             db.session.add(new_collection)
             db.session.commit()
             flash("Account created!", category="success")
@@ -94,11 +91,13 @@ def sign_up():
 @auth.route("/google-signin")
 def google_signin():
     """
-        Redirect to google sso
+    Redirect to google sso
 
-        Return: redirects to callback function
+    Return: redirects to callback function
     """
-    return oauth.notes_app.authorize_redirect(url_for("auth.callback_url", _external=True))
+    return oauth.notes_app.authorize_redirect(
+        url_for("auth.callback_url", _external=True)
+    )
 
 
 @auth.route("/authCallback")
@@ -120,15 +119,15 @@ def callback_url():
         login_user(user)
         flash("Logged in successfully!", category="success")
         default_collection = Collection.query.filter_by(
-            user_id=user.id, title=DEFAULT_COLLECTION).first()
+            user_id=user.id, title=DEFAULT_COLLECTION
+        ).first()
         return redirect(url_for("notes.my_notes", collection_id=default_collection.id))
 
     google_user = User(first_name=user_info.get("given_name"), email=email)
     db.session.add(google_user)
     db.session.commit()
 
-    new_collection = Collection(
-        title=DEFAULT_COLLECTION, user_id=google_user.id)
+    new_collection = Collection(title=DEFAULT_COLLECTION, user_id=google_user.id)
     db.session.add(new_collection)
     db.session.commit()
     flash("Account created!", category="success")
