@@ -25,7 +25,7 @@ oauth.register("notes_app",
                client_secret=app_config.get("OAUTH2_CLIENT_SECRET"),
                server_metadata_url=app_config.get("OAUTH2_META_URL"),
                client_kwargs={
-                   "scope": "openid profile email https://www.googleapis.com/auth/user.birthday.read https://www.googleapis.com/auth/user.gender.read"
+                   "scope": "openid profile email https://www.googleapis.com/auth/user.gender.read"
                })
 
 
