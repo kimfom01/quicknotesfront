@@ -15,27 +15,27 @@ app_config = {
     "OAUTH2_CLIENT_SECRET": getenv("OAUTH2_CLIENT_SECRET"),
     "OAUTH2_META_URL": getenv("OAUTH2_META_URL"),
     "FLASK_SECRET": getenv("FLASK_SECRET"),
-    "DB_URI": getenv("DB_URI")
+    "DB_URI": getenv("DB_URI"),
 }
 
 oauth = OAuth()
 
-oauth.register("notes_app",
-               client_id=app_config.get("OAUTH2_CLIENT_ID"),
-               client_secret=app_config.get("OAUTH2_CLIENT_SECRET"),
-               server_metadata_url=app_config.get("OAUTH2_META_URL"),
-               client_kwargs={
-                   "scope": "openid profile email https://www.googleapis.com/auth/user.gender.read"
-               })
+oauth.register(
+    "notes_app",
+    client_id=app_config.get("OAUTH2_CLIENT_ID"),
+    client_secret=app_config.get("OAUTH2_CLIENT_SECRET"),
+    server_metadata_url=app_config.get("OAUTH2_META_URL"),
+    client_kwargs={"scope": "openid profile email"},
+)
 
 
 def create_app():
     """
-        Initialize app
+    Initialize app
     """
     app = Flask(__name__)
     app.config["SECRET_KEY"] = app_config.get("FLASK_SECRET")
-    app.config["SQLALCHEMY_DATABASE_URI"] = app_config.get('DB_URI')
+    app.config["SQLALCHEMY_DATABASE_URI"] = app_config.get("DB_URI")
 
     db.init_app(app)
 

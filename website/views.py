@@ -8,7 +8,7 @@ views = Blueprint("views", __name__)
 @views.route("/", methods=["GET"])
 def home():
     """
-        Render the homepage
+    Render the homepage
     """
     if request.method == "POST":
         return redirect(url_for("notes.new_note"))
