@@ -34,6 +34,6 @@ class Note(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.String(10000))
-    date = db.Column(db.DateTime(timezone=True), default=func.current_date)
+    date = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"))
     collection_id = db.Column(db.Integer, db.ForeignKey("collection.id"))
