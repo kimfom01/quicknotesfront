@@ -1,11 +1,15 @@
+from os import getenv
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv
 from . import db, oauth
 from .models import User, Collection
 
 auth = Blueprint("auth", __name__)
 DEFAULT_COLLECTION = "Default Collection"
+
+load_dotenv()
 
 
 @auth.route("/login", methods=["GET", "POST"])
@@ -37,6 +41,25 @@ def login():
             else:
                 flash("User does not exist!", category="error")
     return render_template("login.html", user=current_user)
+
+
+@auth.route("/demo-login", methods=["GET"])
+def demo_login():
+    """
+    Demo login for guests and explorers
+    """
+
+    email = getenv("DEMO_USERNAME")
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        flash("Something is wrong. Try to login manually", category="error")
+        return render_template("login.html", user=current_user)
+    else:
+        flash("Logged in successfully!", category="success")
+        login_user(user, remember=False)
+        return redirect(url_for("notes.my_collections"))
 
 
 @auth.route("/logout")
