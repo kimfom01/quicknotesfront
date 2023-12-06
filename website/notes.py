@@ -60,7 +60,7 @@ def new_note():
     return render_template("new_note.html", user=current_user)
 
 
-@notes.route("/delete-note", methods=["POST"])
+@notes.route("/delete-note", methods=["DELETE"])
 @login_required
 def delete_note():
     """
@@ -71,8 +71,10 @@ def delete_note():
 
     note = Note.query.get(note_id)
 
-    if note:
-        if note.user_id == current_user.id:
-            db.session.delete(note)
-            db.session.commit()
-    return jsonify({})
+    if not note:
+        return jsonify({}), 404
+
+    if note.user_id == current_user.id:
+        db.session.delete(note)
+        db.session.commit()
+    return jsonify({}), 204
