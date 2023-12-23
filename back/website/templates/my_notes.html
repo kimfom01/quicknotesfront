@@ -5,7 +5,11 @@ content %}
   {% for note in notes %}
   <li class="list-group-item">
     <div class="wrap-text">{{ note.data }}</div>
-    <button type="button" class="close" onClick="deleteNote({{ note.id }})">
+    <button
+      type="button"
+      class="close"
+      onClick="deleteNote({{ note.id }}, {{note.collection_id}})"
+    >
       <span aria-hidden="true">&times;</span>
     </button>
   </li>
