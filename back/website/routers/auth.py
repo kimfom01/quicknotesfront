@@ -4,9 +4,9 @@ from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 
-from .models.Collection import Collection
-from . import db, oauth
-from .models.User import User
+from ..models.Collection import Collection
+from .. import db, oauth
+from ..models.User import User
 
 auth = Blueprint("auth", __name__)
 DEFAULT_COLLECTION = "Default Collection"
