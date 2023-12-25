@@ -6,6 +6,7 @@ from ..models.Collection import Collection
 
 from ..models.Note import Note
 from ..repositories.notes_repo import notes_repo
+from ..repositories.collection_repo import collection_repo
 
 
 notes = Blueprint("notes", __name__)
@@ -32,7 +33,7 @@ def my_collections():
     Show collections
     """
 
-    response = notes_repo.get_collections(user_id=current_user.id)
+    response = collection_repo.get_collections(user_id=current_user.id)
 
     return render_template(
         "my_collections.html", user=current_user, collection=response.body
@@ -46,7 +47,12 @@ def new_note():
     Create new note
     """
 
-    collections = Collection.query.filter_by(user_id=current_user.id).all()
+    response = collection_repo.get_collections(user_id=current_user.id)
+    if not response.success:
+        flash("Something went wrong, try again", category="error")
+        return
+
+    collections = response.body
 
     if request.method == "POST":
         data = request.form.get("note")
