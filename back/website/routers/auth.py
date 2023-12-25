@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from ..models.Collection import Collection
 from .. import db, oauth
 from ..models.User import User
+from ..repositories.user_repo import user_repo
 
 auth = Blueprint("auth", __name__)
 DEFAULT_COLLECTION = "Default Collection"
@@ -28,20 +29,34 @@ def login():
         elif len(password) < 7:
             flash("Password must be greater than 6 characters", category="error")
         else:
-            user = User.query.filter_by(email=email).first()
+            response = user_repo.get_by_email(email=email)
 
-            if user:
-                if not user.password:
-                    flash("You do not have a password!", category="error")
-                    flash("Click Sign in with Google to continue", category="error")
-                    return render_template("login.html", user=current_user)
-                if check_password_hash(user.password, password):
-                    flash("Logged in successfully!", category="success")
-                    login_user(user, remember=True)
-                    return redirect(url_for("notes.my_notes"))
-                flash("Invalid email or password!", category="error")
-            else:
+            if not response.success:
                 flash("User does not exist!", category="error")
+
+                return render_template("login.html", user=current_user)
+
+            user = response.body
+            default_collection = Collection.query.filter_by(
+                user_id=user.id, title=DEFAULT_COLLECTION
+            ).first()
+
+            if not user.password:
+                flash("You do not have a password!", category="error")
+                flash("Click Sign in with Google to continue", category="error")
+
+                return render_template("login.html", user=current_user)
+
+            if check_password_hash(user.password, password):
+                flash("Logged in successfully!", category="success")
+                login_user(user, remember=True)
+
+                return redirect(
+                    url_for("notes.my_notes", collection_id=default_collection.id)
+                )
+
+            flash("Invalid email or password!", category="error")
+
     return render_template("login.html", user=current_user)
 
 
@@ -53,15 +68,20 @@ def demo_login():
 
     email = getenv("DEMO_USERNAME")
 
-    user = User.query.filter_by(email=email).first()
+    response = user_repo.get_by_email(email=email)
 
-    if not user:
-        flash("Something is wrong. Try to login manually", category="error")
+    if not response.success:
+        flash(
+            "Something is wrong. Try to again or create your account to login",
+            category="error",
+        )
         return render_template("login.html", user=current_user)
-    else:
-        flash("Logged in successfully!", category="success")
-        login_user(user, remember=False)
-        return redirect(url_for("notes.my_collections"))
+
+    user = response.body
+
+    flash("Logged in successfully!", category="success")
+    login_user(user, remember=False)
+    return redirect(url_for("notes.my_collections"))
 
 
 @auth.route("/logout")
@@ -87,10 +107,14 @@ def sign_up():
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
 
-        user = User.query.filter_by(email=email).first()
-        if user:
+        response = user_repo.get_by_email(email=email)
+
+        if response.success:
             flash("User already exist!", category="error")
-        elif len(email) < 4:
+
+            return render_template("sign_up.html", user=current_user)
+
+        if len(email) < 4:
             flash("Email must be greater than 3 characters", category="error")
         elif len(first_name) < 2:
             flash("First name must be greater than 1 character", category="error")
@@ -101,15 +125,21 @@ def sign_up():
         else:
             password_hash = generate_password_hash(password1, method="sha256")
             new_user = User(email=email, first_name=first_name, password=password_hash)
-            db.session.add(new_user)
-            db.session.commit()
+            response = user_repo.create_user(new_user)
 
-            new_collection = Collection(title=DEFAULT_COLLECTION, user_id=new_user.id)
-            db.session.add(new_collection)
-            db.session.commit()
-            flash("Account created!", category="success")
-            login_user(new_user)
-            return redirect(url_for("notes.my_notes"))
+            if response.success:
+                user = response.body
+
+                # TODO: Refactor collection repo too
+                new_collection = Collection(title=DEFAULT_COLLECTION, user_id=user.id)
+                db.session.add(new_collection)
+                db.session.commit()
+
+                flash("Account created!", category="success")
+                login_user(user)
+
+                return redirect(url_for("notes.my_notes"))
+
     return render_template("sign_up.html", user=current_user)
 
 
@@ -128,19 +158,20 @@ def google_signin():
 @auth.route("/authCallback")
 def callback_url():
     """sumary_line
+    Gets the token from google oauth and log in the
+    user or create a new user if user doesn't have an account
 
-    Keyword arguments:
-    argument -- description
-    Return: return_description
+    Return: redirects to the user's notes
     """
     token = oauth.notes_app.authorize_access_token()
     session["user"] = token
     user_info = session["user"].get("userinfo")
     email = user_info.get("email")
 
-    user = User.query.filter_by(email=email).first()
+    response = user_repo.get_by_email(email=email)
 
-    if user:
+    if response.success:
+        user = response.body
         login_user(user)
         flash("Logged in successfully!", category="success")
         default_collection = Collection.query.filter_by(
@@ -148,13 +179,17 @@ def callback_url():
         ).first()
         return redirect(url_for("notes.my_notes", collection_id=default_collection.id))
 
+    # Create a new user
     google_user = User(first_name=user_info.get("given_name"), email=email)
-    db.session.add(google_user)
-    db.session.commit()
+    response = user_repo.create_user(google_user)
 
-    new_collection = Collection(title=DEFAULT_COLLECTION, user_id=google_user.id)
-    db.session.add(new_collection)
-    db.session.commit()
-    flash("Account created!", category="success")
-    login_user(google_user)
-    return redirect(url_for("notes.my_notes"))
+    if response.success:
+        new_collection = Collection(title=DEFAULT_COLLECTION, user_id=google_user.id)
+        db.session.add(new_collection)
+        db.session.commit()
+        flash("Account created!", category="success")
+        login_user(google_user)
+        return redirect(url_for("notes.my_notes"))
+
+    flash("Something wen't wrong during google login", category="error")
+    return redirect(url_for("auth.login"))
