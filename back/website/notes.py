@@ -87,8 +87,6 @@ def delete_note():
 
     response = notes_repo.delete_note(note_id=note_id, collection_id=collection_id)
 
-    # TODO: Fix 500 error return status
-
     if response.success:
         return jsonify({"message": response.message}), 204
 
