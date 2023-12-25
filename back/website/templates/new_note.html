@@ -17,7 +17,13 @@ content %}
               class="form-control"
             ></textarea>
           </div>
-          <div align="right">
+          <div class="d-flex justify-content-between">
+            <select name="collection_id" required>
+              <option value="">-- Choose a Collection --</option>
+              {% for coll in collections %}
+              <option value="{{coll.id}}">{{coll.title}}</option>
+              {% endfor %}
+            </select>
             <button type="submit" class="btn btn-primary">Save</button>
           </div>
         </form>

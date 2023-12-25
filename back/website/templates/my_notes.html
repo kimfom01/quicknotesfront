@@ -2,10 +2,14 @@
 content %}
 <h1 align="center" class="mt-5">{{ user.first_name }}'s Notes</h1>
 <ul class="list-group list-group-flush" id="notes">
-  {% for note in collection.notes %}
+  {% for note in notes %}
   <li class="list-group-item">
     <div class="wrap-text">{{ note.data }}</div>
-    <button type="button" class="close" onClick="deleteNote({{ note.id }})">
+    <button
+      type="button"
+      class="close"
+      onClick="deleteNote({{ note.id }}, {{note.collection_id}})"
+    >
       <span aria-hidden="true">&times;</span>
     </button>
   </li>

@@ -39,15 +39,15 @@ def create_app():
 
     db.init_app(app)
 
-    from .views import views
-    from .auth import auth
-    from .notes import notes
+    from .routers.views import views
+    from .routers.auth import auth
+    from .routers.notes import notes
 
     app.register_blueprint(views, url_prefix="/")
     app.register_blueprint(auth, url_prefix="/")
     app.register_blueprint(notes, url_prefix="/")
 
-    from .models import User
+    from .models.User import User
 
     Migrate(app, db)
 
