@@ -26,8 +26,10 @@ class NotesRepo:
             return Response(success=False, message="Collections not found", body=None)
         return Response(success=True, message="Success", body=collections)
 
-    def create_note(self, note: Note) -> Response:
+    def create_note(self, data: str, user_id: int, collection_id: int) -> Response:
         try:
+            note = Note(data=data, user_id=user_id, collection_id=collection_id)
+
             db.session.add(note)
             db.session.commit()
             db.session.refresh(note)

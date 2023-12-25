@@ -2,9 +2,7 @@ import json
 from flask import Blueprint, request, render_template, jsonify, flash, redirect, url_for
 from flask_login import login_required, current_user
 
-from ..models.Collection import Collection
 
-from ..models.Note import Note
 from ..repositories.notes_repo import notes_repo
 from ..repositories.collection_repo import collection_repo
 
@@ -64,11 +62,9 @@ def new_note():
                 "new_note.html", user=current_user, collections=collections
             )
 
-        created_note = Note(
+        response = notes_repo.create_note(
             data=data, user_id=current_user.id, collection_id=collection_id
         )
-
-        response = notes_repo.create_note(note=created_note)
 
         if response.success:
             flash("Note saved!", category="success")
