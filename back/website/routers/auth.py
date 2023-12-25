@@ -4,7 +4,6 @@ from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 
-from ..models.Collection import Collection
 from .. import oauth
 from ..models.User import User
 from ..repositories.user_repo import user_repo
@@ -136,9 +135,9 @@ def sign_up():
             if response.success:
                 user = response.body
 
-                new_collection = Collection(title=DEFAULT_COLLECTION, user_id=user.id)
-
-                response = collection_repo.create_collection(new_collection)
+                response = collection_repo.create_collection(
+                    title=DEFAULT_COLLECTION, user_id=user.id
+                )
 
                 if not response.success:
                     flash("Account created but no default category", category="warning")
@@ -198,9 +197,9 @@ def callback_url():
     response = user_repo.create_user(google_user)
 
     if response.success:
-        new_collection = Collection(title=DEFAULT_COLLECTION, user_id=google_user.id)
-
-        response = collection_repo.create_collection(new_collection)
+        response = collection_repo.create_collection(
+            title=DEFAULT_COLLECTION, user_id=google_user.id
+        )
 
         if not response.success:
             flash("Account created but no default category", category="warning")

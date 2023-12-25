@@ -25,8 +25,10 @@ class CollectionRepo:
             )
         return Response(success=True, message="Success", body=collection)
 
-    def create_collection(self, collection: Collection) -> Response:
+    def create_collection(self, title: str, user_id: int) -> Response:
         try:
+            collection = Collection(title=title, user_id=user_id)
+
             db.session.add(collection)
             db.session.commit()
             db.session.refresh(collection)
