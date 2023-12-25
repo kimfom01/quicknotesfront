@@ -5,9 +5,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 
 from ..models.Collection import Collection
-from .. import db, oauth
+from .. import oauth
 from ..models.User import User
 from ..repositories.user_repo import user_repo
+from ..repositories.collection_repo import collection_repo
 
 auth = Blueprint("auth", __name__)
 DEFAULT_COLLECTION = "Default Collection"
@@ -37,9 +38,14 @@ def login():
                 return render_template("login.html", user=current_user)
 
             user = response.body
-            default_collection = Collection.query.filter_by(
-                user_id=user.id, title=DEFAULT_COLLECTION
-            ).first()
+
+            response = collection_repo.get_default_collection(user_id=user.id)
+
+            if not response.success:
+                flash(response.message, category="error")
+                return
+
+            default_collection = response.body
 
             if not user.password:
                 flash("You do not have a password!", category="error")
@@ -130,12 +136,15 @@ def sign_up():
             if response.success:
                 user = response.body
 
-                # TODO: Refactor collection repo too
                 new_collection = Collection(title=DEFAULT_COLLECTION, user_id=user.id)
-                db.session.add(new_collection)
-                db.session.commit()
 
-                flash("Account created!", category="success")
+                response = collection_repo.create_collection(new_collection)
+
+                if not response.success:
+                    flash("Account created but no default category", category="warning")
+                else:
+                    flash("Account created!", category="success")
+
                 login_user(user)
 
                 return redirect(url_for("notes.my_notes"))
@@ -174,20 +183,29 @@ def callback_url():
         user = response.body
         login_user(user)
         flash("Logged in successfully!", category="success")
-        default_collection = Collection.query.filter_by(
-            user_id=user.id, title=DEFAULT_COLLECTION
-        ).first()
+
+        response = collection_repo.get_default_collection(user_id=user.id)
+
+        if not response.success:
+            flash(response.message, category="error")
+            return
+
+        default_collection = response.body
+
         return redirect(url_for("notes.my_notes", collection_id=default_collection.id))
 
-    # Create a new user
     google_user = User(first_name=user_info.get("given_name"), email=email)
     response = user_repo.create_user(google_user)
 
     if response.success:
         new_collection = Collection(title=DEFAULT_COLLECTION, user_id=google_user.id)
-        db.session.add(new_collection)
-        db.session.commit()
-        flash("Account created!", category="success")
+
+        response = collection_repo.create_collection(new_collection)
+
+        if not response.success:
+            flash("Account created but no default category", category="warning")
+        else:
+            flash("Account created!", category="success")
         login_user(google_user)
         return redirect(url_for("notes.my_notes"))
 
