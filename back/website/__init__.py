@@ -41,7 +41,7 @@ def create_app():
 
     from .routers.views import views
     from .routers.auth import auth
-    from .notes import notes
+    from .routers.notes import notes
 
     app.register_blueprint(views, url_prefix="/")
     app.register_blueprint(auth, url_prefix="/")

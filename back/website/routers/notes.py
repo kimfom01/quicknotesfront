@@ -2,10 +2,10 @@ import json
 from flask import Blueprint, request, render_template, jsonify, flash, redirect, url_for
 from flask_login import login_required, current_user
 
-from .models.Collection import Collection
+from ..models.Collection import Collection
 
-from .models.Note import Note
-from .repositories.notes_repo import notes_repo
+from ..models.Note import Note
+from ..repositories.notes_repo import notes_repo
 
 
 notes = Blueprint("notes", __name__)
