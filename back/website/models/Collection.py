@@ -1,4 +1,4 @@
-from website import db
+from .. import db
 
 
 class Collection(db.Model):
