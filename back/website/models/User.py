@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-from website import db
+from .. import db
 from sqlalchemy.sql.expression import func
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 
