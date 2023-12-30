@@ -1,12 +1,16 @@
+import pytest
 from .conftest import client
+import re
 
 
+@pytest.mark.order(1)
 def test_get_login(client):
     response = client.get("/login")
 
     assert response.status_code == 200
 
 
+@pytest.mark.order(2)
 def test_post_login(client):
     email = "test@mail.com"
     password = "P@$$w0rd123"
@@ -16,12 +20,78 @@ def test_post_login(client):
     with client.application.app_context():
         response = client.post("/login", data=data)
 
+    # Valid login should redirect but return 200
     assert response.status_code == 200
 
 
-def test_get_register(client):
-    pass
+@pytest.mark.order(3)
+def test_post_login_invalid(client):
+    email = "test@mail.com"
+    password = "12345"
+
+    data = {"email": email, "password": password}
+
+    with client.application.app_context():
+        response = client.post("/login", data=data)
+
+    # Invalid login should refresh the page and return 200
+    assert response.status_code == 200
+    assert re.search(
+        "Password must be greater than 6 characters", response.get_data(as_text=True)
+    )
 
 
-def test_post_register(client):
-    pass
+@pytest.mark.order(4)
+def test_get_signup(client):
+    response = client.get("/sign-up")
+
+    assert response.status_code == 200
+
+
+@pytest.mark.order(5)
+def test_post_signup(client):
+    email = "test@mail.com"
+    first_name = "test"
+    password1 = "P@$$w0rd123"
+    password2 = "P@$$w0rd123"
+
+    data = {
+        "email": email,
+        "firstName": first_name,
+        "password1": password1,
+        "password2": password2,
+    }
+
+    with client.application.app_context():
+        response = client.post("/sign-up", data=data)
+
+    # Valid signup should redirect and return 302
+    assert response.status_code == 302
+
+
+@pytest.mark.order(6)
+def test_post_signup_invalid(client):
+    email = "test2@mail.com"
+    first_name = "test2"
+    password1 = "Passw0rd123"
+    password2 = "P@$$w0rd123"
+
+    data = {
+        "email": email,
+        "firstName": first_name,
+        "password1": password1,
+        "password2": password2,
+    }
+
+    with client.application.app_context():
+        response = client.post("/sign-up", data=data)
+
+    # Invalid signup should refresh the page and return 200
+    assert response.status_code == 200
+    assert re.search(
+        "Password and Confirm Password must match", response.get_data(as_text=True)
+    )
+
+
+# DELETE FROM public.users
+# WHERE id IN (2, 6, 7);
