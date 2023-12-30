@@ -37,4 +37,5 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Test with pytest
         run: |
+          export DB_URI=${{ env.DB_URI }}
           pytest back/tests/
