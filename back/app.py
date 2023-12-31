@@ -1,5 +1,5 @@
-from .website import create_app
-from .website import oauth
+from website import create_app
+from website import oauth
 
 
 app = create_app()
