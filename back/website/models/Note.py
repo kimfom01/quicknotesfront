@@ -19,6 +19,7 @@ class Note(db.Model):
         nullable=False,
         server_default=func.now(),
     )
+    deleted = db.Column(db.Boolean, default=False)
     updated_at = db.Column(TIMESTAMP(timezone=True), onupdate=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"))
     collection_id = db.Column(db.Integer, db.ForeignKey("collections.id"))
