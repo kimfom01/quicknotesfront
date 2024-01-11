@@ -27,7 +27,13 @@ def test_post_signup(client):
     with client.application.app_context():
         response = client.post("/sign-up", data=data)
 
-    assert re.search("Redirecting", response.get_data(as_text=True)) is not None
+    assert (
+        re.search(
+            'You should be redirected automatically to the target URL: <a href="/my-notes">/my-notes</a>. If not, click the link',
+            response.get_data(as_text=True),
+        )
+        is not None
+    )
 
 
 @pytest.mark.order(3)
@@ -69,7 +75,10 @@ def test_post_login(client):
     with client.application.app_context():
         response = client.post("/login", data=data)
 
-    assert re.search("Redirecting", response.get_data(as_text=True))
+    assert re.search(
+        'You should be redirected automatically to the target URL: <a href="\/my-notes\?collection_id=\d+">\/my-notes\?collection_id=\d+<\/a>\. If not, click the link',
+        response.get_data(as_text=True),
+    )
 
 
 @pytest.mark.order(6)
