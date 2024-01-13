@@ -13,7 +13,7 @@ class NotesRepo:
         return Response(success=True, message="Success", body=note)
 
     def get_all(self, collection_id: int) -> Response:
-        notes = Note.query.filter_by(collection_id=collection_id).all()
+        notes = Note.query.filter_by(collection_id=collection_id, deleted=False).all()
 
         if notes is None:
             return Response(success=False, message="Notes not found", body=None)
@@ -28,7 +28,9 @@ class NotesRepo:
 
     def create_note(self, data: str, user_id: int, collection_id: int) -> Response:
         try:
-            note = Note(data=data, user_id=user_id, collection_id=collection_id)
+            note = Note(
+                data=data, user_id=user_id, collection_id=collection_id, deleted=False
+            )
 
             db.session.add(note)
             db.session.commit()
@@ -45,7 +47,7 @@ class NotesRepo:
             return Response(success=False, message="Note not found", body=None)
 
         try:
-            db.session.delete(note)
+            note.deleted = True
             db.session.commit()
 
             return Response(success=True, message="Successfully deleted", body=None)

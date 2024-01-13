@@ -3,6 +3,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash
 from dotenv import load_dotenv
+from email_validator import validate_email, EmailNotValidError
 
 from .. import oauth
 from ..repositories.user_repo import user_repo
@@ -23,10 +24,17 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
 
-        if len(email) < 4:
-            flash("Email must be greater than 3 characters", category="error")
-        elif len(password) < 7:
+        try:
+            emailObject = validate_email(email)
+
+            email = emailObject.normalized
+        except EmailNotValidError as errorMsg:
+            flash(str(errorMsg), category="error")
+            return render_template("login.html", user=current_user)
+
+        if len(password) < 7:
             flash("Password must be greater than 6 characters", category="error")
+            return render_template("login.html", user=current_user)
         else:
             response = user_repo.get_by_email(email=email)
 
@@ -41,7 +49,7 @@ def login():
 
             if not response.success:
                 flash(response.message, category="error")
-                return
+                return render_template("login.html", user=current_user)
 
             default_collection = response.body
 
@@ -118,14 +126,23 @@ def sign_up():
 
             return render_template("sign_up.html", user=current_user)
 
-        if len(email) < 4:
-            flash("Email must be greater than 3 characters", category="error")
-        elif len(first_name) < 2:
+        try:
+            emailObject = validate_email(email)
+
+            email = emailObject.normalized
+        except EmailNotValidError as errorMsg:
+            flash(str(errorMsg), category="error")
+            return render_template("sign_up.html", user=current_user)
+
+        if len(first_name) < 2:
             flash("First name must be greater than 1 character", category="error")
+            return render_template("sign_up.html", user=current_user)
         elif len(password1) < 7:
             flash("Password must be greater than 6 characters", category="error")
+            return render_template("sign_up.html", user=current_user)
         elif password1 != password2:
             flash("Password and Confirm Password must match", category="error")
+            return render_template("sign_up.html", user=current_user)
         else:
             response = user_repo.create_user(
                 email=email, first_name=first_name, password=password1
@@ -139,7 +156,7 @@ def sign_up():
                 )
 
                 if not response.success:
-                    flash("Account created but no default category", category="warning")
+                    flash("Account created but no default category", category="error")
                 else:
                     flash("Account created!", category="success")
 
@@ -203,7 +220,7 @@ def callback_url():
         )
 
         if not response.success:
-            flash("Account created but no default category", category="warning")
+            flash("Account created but no default category", category="error")
         else:
             flash("Account created!", category="success")
         login_user(user)
