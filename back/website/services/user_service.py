@@ -1,6 +1,9 @@
+from flask_login import login_user
+from website.repositories.collection_repo import collection_repo
 from website.repositories.user_repo import UserRepo, user_repo
 from ..schema.Response import Response
 from email_validator import validate_email, EmailNotValidError
+from werkzeug.security import check_password_hash
 
 
 class UserService:
@@ -20,6 +23,48 @@ class UserService:
             return Response(success=True, message="Success", body=user)
         except EmailNotValidError as errorMsg:
             return Response(success=False, message=str(errorMsg), body=None)
+
+    def login_user(self, email: str, password: str):
+        if len(password) < 7:
+            return Response(
+                success=False,
+                message="Password must be greater than 6 characters",
+                body=None,
+            )
+        else:
+            response = self.get_by_email(email=email)
+
+            if not response.success:
+                return Response(success=False, message=response.message, body=None)
+
+            user = response.body
+
+            response = collection_repo.get_default_collection(user_id=user.id)
+
+            if not response.success:
+                return Response(success=False, message=response.message, body=None)
+
+            default_collection = response.body
+
+            if not user.password:
+                return Response(
+                    success=False,
+                    message="You do not have a password!\nClick Sign in with Google to continue",
+                    body=None,
+                )
+
+            if check_password_hash(user.password, password):
+                login_user(user, remember=True)
+                return Response(
+                    success=True,
+                    message="Logged in successfully!",
+                    body=default_collection,
+                )
+            return Response(
+                success=False,
+                message="Invalid email or password!",
+                body=None,
+            )
 
     def create_user(self, email: str, first_name: str, password: str) -> Response:
         if len(first_name) <= 1:

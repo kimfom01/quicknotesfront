@@ -1,9 +1,7 @@
 from os import getenv
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from flask_login import login_user, login_required, logout_user, current_user
-from werkzeug.security import check_password_hash
 from dotenv import load_dotenv
-from email_validator import validate_email, EmailNotValidError
 
 from .. import oauth
 
@@ -26,50 +24,14 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
 
-        try:
-            emailObject = validate_email(email)
+        response = user_service.login_user(email=email, password=password)
 
-            email = emailObject.normalized
-        except EmailNotValidError as errorMsg:
-            flash(str(errorMsg), category="error")
-            return render_template("login.html", user=current_user)
-
-        if len(password) < 7:
-            flash("Password must be greater than 6 characters", category="error")
-            return render_template("login.html", user=current_user)
+        if response.success:
+            flash(response.message, category="success")
+            return redirect(url_for("notes.my_notes", collection_id=response.body.id))
         else:
-            response = user_service.get_by_email(email=email)
-
-            if not response.success:
-                flash("User does not exist!", category="error")
-
-                return render_template("login.html", user=current_user)
-
-            user = response.body
-
-            response = collection_repo.get_default_collection(user_id=user.id)
-
-            if not response.success:
-                flash(response.message, category="error")
-                return render_template("login.html", user=current_user)
-
-            default_collection = response.body
-
-            if not user.password:
-                flash("You do not have a password!", category="error")
-                flash("Click Sign in with Google to continue", category="error")
-
-                return render_template("login.html", user=current_user)
-
-            if check_password_hash(user.password, password):
-                flash("Logged in successfully!", category="success")
-                login_user(user, remember=True)
-
-                return redirect(
-                    url_for("notes.my_notes", collection_id=default_collection.id)
-                )
-
-            flash("Invalid email or password!", category="error")
+            flash(response.message, category="error")
+            return render_template("login.html", user=current_user)
 
     return render_template("login.html", user=current_user)
 
