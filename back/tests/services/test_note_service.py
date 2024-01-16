@@ -21,14 +21,32 @@ def test_get_by_id_valid(note_repo):
     assert response.message == "Success"
 
 
-def test_get_by_id_invalid(note_repo):
-    note_repo.get_by_id.return_value = None
+def test_get_by_id_collection_id_invalid(note_repo):
+    note_repo.get_by_id.return_value = Response(
+        success=False,
+        message="Id or Collection id cannot be less than or equal to 0",
+        body=None,
+    )
     note_service = NoteService(note_repo)
 
     response = note_service.get_by_id(id=1, collection_id=0)
 
     assert response.success == False
-    assert response.message == "Note not found"
+    assert response.message == "Id or Collection id cannot be less than or equal to 0"
+
+
+def test_get_by_id_note_id_invalid(note_repo):
+    note_repo.get_by_id.return_value = Response(
+        success=False,
+        message="Id or Collection id cannot be less than or equal to 0",
+        body=None,
+    )
+    note_service = NoteService(note_repo)
+
+    response = note_service.get_by_id(id=0, collection_id=1)
+
+    assert response.success == False
+    assert response.message == "Id or Collection id cannot be less than or equal to 0"
 
 
 def test_get_all_valid(note_repo):

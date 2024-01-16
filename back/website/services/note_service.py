@@ -8,6 +8,13 @@ class NoteService:
         self.notes_repo = notes_repo
 
     def get_by_id(self, id: int, collection_id: int) -> Response:
+        if id <= 0 or collection_id <= 0:
+            return Response(
+                success=False,
+                message="Id or Collection id cannot be less than or equal to 0",
+                body=None,
+            )
+
         note = self.notes_repo.get_by_id(id=id, collection_id=collection_id)
 
         if note is None:
