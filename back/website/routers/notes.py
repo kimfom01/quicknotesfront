@@ -19,7 +19,10 @@ def my_notes():
 
     collection_id = request.args.get("collection_id")
 
-    response = note_service.get_all(collection_id)
+    try:
+        response = note_service.get_all(int(collection_id))
+    except:
+        return render_template("404.html", user=current_user)
 
     return render_template("my_notes.html", user=current_user, notes=response.body)
 
