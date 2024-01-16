@@ -3,10 +3,9 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from flask_login import login_user, login_required, logout_user, current_user
 from dotenv import load_dotenv
 
+from ..services.auth_service import auth_service
 from .. import oauth
-
 from ..repositories.collection_repo import collection_repo
-
 from ..services.user_service import user_service
 
 auth = Blueprint("auth", __name__)
@@ -24,7 +23,7 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
 
-        response = user_service.login_user(email=email, password=password)
+        response = auth_service.login_user(email=email, password=password)
 
         if response.success:
             flash(response.message, category="success")
