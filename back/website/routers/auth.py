@@ -1,14 +1,11 @@
 from os import getenv
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from flask_login import login_user, login_required, logout_user, current_user
-from werkzeug.security import check_password_hash
 from dotenv import load_dotenv
-from email_validator import validate_email, EmailNotValidError
 
+from ..services.auth_service import auth_service
 from .. import oauth
-
 from ..repositories.collection_repo import collection_repo
-
 from ..services.user_service import user_service
 
 auth = Blueprint("auth", __name__)
@@ -26,50 +23,14 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
 
-        try:
-            emailObject = validate_email(email)
+        response = auth_service.login_user(email=email, password=password)
 
-            email = emailObject.normalized
-        except EmailNotValidError as errorMsg:
-            flash(str(errorMsg), category="error")
-            return render_template("login.html", user=current_user)
-
-        if len(password) < 7:
-            flash("Password must be greater than 6 characters", category="error")
-            return render_template("login.html", user=current_user)
+        if response.success:
+            flash(response.message, category="success")
+            return redirect(url_for("notes.my_notes", collection_id=response.body.id))
         else:
-            response = user_service.get_by_email(email=email)
-
-            if not response.success:
-                flash("User does not exist!", category="error")
-
-                return render_template("login.html", user=current_user)
-
-            user = response.body
-
-            response = collection_repo.get_default_collection(user_id=user.id)
-
-            if not response.success:
-                flash(response.message, category="error")
-                return render_template("login.html", user=current_user)
-
-            default_collection = response.body
-
-            if not user.password:
-                flash("You do not have a password!", category="error")
-                flash("Click Sign in with Google to continue", category="error")
-
-                return render_template("login.html", user=current_user)
-
-            if check_password_hash(user.password, password):
-                flash("Logged in successfully!", category="success")
-                login_user(user, remember=True)
-
-                return redirect(
-                    url_for("notes.my_notes", collection_id=default_collection.id)
-                )
-
-            flash("Invalid email or password!", category="error")
+            flash(response.message, category="error")
+            return render_template("login.html", user=current_user)
 
     return render_template("login.html", user=current_user)
 
@@ -128,21 +89,7 @@ def sign_up():
 
             return render_template("sign_up.html", user=current_user)
 
-        # try:
-        #     emailObject = validate_email(email)
-
-        #     email = emailObject.normalized
-        # except EmailNotValidError as errorMsg:
-        #     flash(str(errorMsg), category="error")
-        #     return render_template("sign_up.html", user=current_user)
-
-        if len(first_name) < 2:
-            flash("First name must be greater than 1 character", category="error")
-            return render_template("sign_up.html", user=current_user)
-        elif len(password1) < 7:
-            flash("Password must be greater than 6 characters", category="error")
-            return render_template("sign_up.html", user=current_user)
-        elif password1 != password2:
+        if password1 != password2:
             flash("Password and Confirm Password must match", category="error")
             return render_template("sign_up.html", user=current_user)
         else:
@@ -165,6 +112,8 @@ def sign_up():
                 login_user(user)
 
                 return redirect(url_for("notes.my_notes"))
+            else:
+                flash(response.message, category="error")
 
     return render_template("sign_up.html", user=current_user)
 

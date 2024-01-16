@@ -8,13 +8,34 @@ class UserService:
         self.user_repo = user_repo
 
     def get_by_email(self, email: str) -> Response:
-        user = self.user_repo.get_by_email(email=email)
+        try:
+            emailObject = validate_email(email)
 
-        if user is None:
-            return Response(success=False, message="User not found", body=None)
-        return Response(success=True, message="Success", body=user)
+            email = emailObject.normalized
+
+            user = self.user_repo.get_by_email(email=email)
+
+            if user is None:
+                return Response(
+                    success=False, message="User does not exist!", body=None
+                )
+            return Response(success=True, message="Success", body=user)
+        except EmailNotValidError as errorMsg:
+            return Response(success=False, message=str(errorMsg), body=None)
 
     def create_user(self, email: str, first_name: str, password: str) -> Response:
+        if len(first_name) <= 1:
+            return Response(
+                success=False,
+                message="First name must be greater than 1 character",
+                body=None,
+            )
+        elif len(password) <= 6:
+            return Response(
+                success=False,
+                message="Password must be greater than 6 characters",
+                body=None,
+            )
         try:
             emailObject = validate_email(email)
 
