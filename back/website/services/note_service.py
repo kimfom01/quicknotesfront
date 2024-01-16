@@ -15,6 +15,13 @@ class NoteService:
         return Response(success=True, message="Success", body=note)
 
     def get_all(self, collection_id: int) -> Response:
+        if collection_id <= 0:
+            return Response(
+                success=False,
+                message="Collection id cannot be less than or equal to 0",
+                body=None,
+            )
+
         notes = self.notes_repo.get_all(collection_id=collection_id)
 
         if notes is None:
