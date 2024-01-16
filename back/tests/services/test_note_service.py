@@ -74,7 +74,7 @@ def test_create_note_data_invalid(note_repo):
 def test_create_note_collection_id_invalid(note_repo):
     note_repo.create_note.return_value = Response(
         success=False,
-        message="Unable to create, user id or collection id cannot be 0",
+        message="Unable to create, user id or collection id cannot be less than or equal to 0",
         body=None,
     )
 
@@ -83,13 +83,16 @@ def test_create_note_collection_id_invalid(note_repo):
     response = note_service.create_note(data="test data", user_id=1, collection_id=0)
 
     assert response.success == False
-    assert response.message == "Unable to create, user id or collection id cannot be 0"
+    assert (
+        response.message
+        == "Unable to create, user id or collection id cannot be less than or equal to 0"
+    )
 
 
 def test_create_note_user_id_invalid(note_repo):
     note_repo.create_note.return_value = Response(
         success=False,
-        message="Unable to create, user id or collection id cannot be 0",
+        message="Unable to create, user id or collection id cannot be less than or equal to 0",
         body=None,
     )
 
@@ -98,7 +101,10 @@ def test_create_note_user_id_invalid(note_repo):
     response = note_service.create_note(data="test data", user_id=0, collection_id=1)
 
     assert response.success == False
-    assert response.message == "Unable to create, user id or collection id cannot be 0"
+    assert (
+        response.message
+        == "Unable to create, user id or collection id cannot be less than or equal to 0"
+    )
 
 
 def test_delete_note(note_repo):
@@ -112,7 +118,7 @@ def test_delete_note(note_repo):
 
 def test_delete_note_collection_id_invalid(note_repo):
     note_repo.delete_note.side_effect = Exception(
-        "Unable to delete, note id or collection id cannot be 0"
+        "Unable to delete, note id or collection id cannot be less than or equal to 0"
     )
 
     note_service = NoteService(note_repo)
@@ -120,12 +126,15 @@ def test_delete_note_collection_id_invalid(note_repo):
     response = note_service.delete_note(note_id=1, collection_id=0)
 
     assert response.success == False
-    assert response.message == "Unable to delete, note id or collection id cannot be 0"
+    assert (
+        response.message
+        == "Unable to delete, note id or collection id cannot be less than or equal to 0"
+    )
 
 
 def test_delete_note_note_id_invalid(note_repo):
     note_repo.delete_note.side_effect = Exception(
-        "Unable to delete, note id or collection id cannot be 0"
+        "Unable to delete, note id or collection id cannot be less than or equal to 0"
     )
 
     note_service = NoteService(note_repo)
@@ -133,4 +142,7 @@ def test_delete_note_note_id_invalid(note_repo):
     response = note_service.delete_note(note_id=0, collection_id=1)
 
     assert response.success == False
-    assert response.message == "Unable to delete, note id or collection id cannot be 0"
+    assert (
+        response.message
+        == "Unable to delete, note id or collection id cannot be less than or equal to 0"
+    )

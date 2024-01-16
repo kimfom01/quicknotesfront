@@ -30,9 +30,9 @@ class NoteService:
                     body=None,
                 )
 
-            if user_id == 0 or collection_id == 0:
+            if user_id <= 0 or collection_id <= 0:
                 raise Exception(
-                    "Unable to create, user id or collection id cannot be 0"
+                    "Unable to create, user id or collection id cannot be less than or equal to 0"
                 )
 
             note = self.notes_repo.create_note(
@@ -49,9 +49,9 @@ class NoteService:
 
     def delete_note(self, note_id: int, collection_id: int) -> Response:
         try:
-            if note_id == 0 or collection_id == 0:
+            if note_id <= 0 or collection_id <= 0:
                 raise Exception(
-                    "Unable to delete, note id or collection id cannot be 0"
+                    "Unable to delete, note id or collection id cannot be less than or equal to 0"
                 )
 
             self.notes_repo.delete_note(note_id=note_id, collection_id=collection_id)
