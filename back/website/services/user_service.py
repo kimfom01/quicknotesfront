@@ -24,7 +24,7 @@ class UserService:
         except EmailNotValidError as errorMsg:
             return Response(success=False, message=str(errorMsg), body=None)
 
-    def login_user(self, email: str, password: str):
+    def login_user(self, email: str, password: str) -> Response:
         if len(password) < 7:
             return Response(
                 success=False,
