@@ -22,6 +22,18 @@ class UserService:
             return Response(success=False, message=str(errorMsg), body=None)
 
     def create_user(self, email: str, first_name: str, password: str) -> Response:
+        if len(first_name) <= 1:
+            return Response(
+                success=False,
+                message="First name must be greater than 1 character",
+                body=None,
+            )
+        elif len(password) <= 6:
+            return Response(
+                success=False,
+                message="Password must be greater than 6 characters",
+                body=None,
+            )
         try:
             emailObject = validate_email(email)
 

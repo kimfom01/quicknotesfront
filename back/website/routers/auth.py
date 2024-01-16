@@ -128,21 +128,7 @@ def sign_up():
 
             return render_template("sign_up.html", user=current_user)
 
-        # try:
-        #     emailObject = validate_email(email)
-
-        #     email = emailObject.normalized
-        # except EmailNotValidError as errorMsg:
-        #     flash(str(errorMsg), category="error")
-        #     return render_template("sign_up.html", user=current_user)
-
-        if len(first_name) < 2:
-            flash("First name must be greater than 1 character", category="error")
-            return render_template("sign_up.html", user=current_user)
-        elif len(password1) < 7:
-            flash("Password must be greater than 6 characters", category="error")
-            return render_template("sign_up.html", user=current_user)
-        elif password1 != password2:
+        if password1 != password2:
             flash("Password and Confirm Password must match", category="error")
             return render_template("sign_up.html", user=current_user)
         else:
@@ -165,6 +151,8 @@ def sign_up():
                 login_user(user)
 
                 return redirect(url_for("notes.my_notes"))
+            else:
+                flash(response.message, category="error")
 
     return render_template("sign_up.html", user=current_user)
 

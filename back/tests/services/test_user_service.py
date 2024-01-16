@@ -51,3 +51,23 @@ def test_create_user_email_invalid(user_repo):
         response.message
         == "The email address is not valid. It must have exactly one @-sign."
     )
+
+
+def test_create_user_first_name_invalid(user_repo):
+    user_service = UserService(user_repo)
+    response = user_service.create_user(
+        email="testmail.com", first_name="T", password="Pa$$w0rd"
+    )
+
+    assert response.success == False
+    assert response.message == "First name must be greater than 1 character"
+
+
+def test_create_user_password_invalid(user_repo):
+    user_service = UserService(user_repo)
+    response = user_service.create_user(
+        email="testmail.com", first_name="Test", password="12345"
+    )
+
+    assert response.success == False
+    assert response.message == "Password must be greater than 6 characters"
