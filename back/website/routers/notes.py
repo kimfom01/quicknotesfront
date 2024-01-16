@@ -57,10 +57,10 @@ def new_note():
 
     if request.method == "POST":
         data = request.form.get("note")
-        collection_id: int = request.form.get("collection_id")
+        collection_id = request.form.get("collection_id")
 
         response = note_service.create_note(
-            data=data, user_id=current_user.id, collection_id=collection_id
+            data=data, user_id=current_user.id, collection_id=int(collection_id)
         )
 
         if response.success:
