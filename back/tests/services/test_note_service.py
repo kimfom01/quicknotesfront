@@ -59,16 +59,46 @@ def test_create_note_valid(note_repo):
     assert response.message == "Successfully created"
 
 
-def test_create_note_invalid(note_repo):
+def test_create_note_data_invalid(note_repo):
     note_repo.create_note.return_value = Response(
-        success=False, message="Unable to create", body=None
+        success=False, message="Unable to create, data is invalid", body=None
     )
     note_service = NoteService(note_repo)
 
     response = note_service.create_note(data="", user_id=1, collection_id=1)
 
     assert response.success == False
-    assert response.message == "Unable to create"
+    assert response.message == "Unable to create, data is invalid"
+
+
+def test_create_note_collection_id_invalid(note_repo):
+    note_repo.create_note.return_value = Response(
+        success=False,
+        message="Unable to create, user or collection cannot be 0",
+        body=None,
+    )
+
+    note_service = NoteService(note_repo)
+
+    response = note_service.create_note(data="test data", user_id=1, collection_id=0)
+
+    assert response.success == False
+    assert response.message == "Unable to create, user or collection cannot be 0"
+
+
+def test_create_note_user_id_invalid(note_repo):
+    note_repo.create_note.return_value = Response(
+        success=False,
+        message="Unable to create, user or collection cannot be 0",
+        body=None,
+    )
+
+    note_service = NoteService(note_repo)
+
+    response = note_service.create_note(data="test data", user_id=0, collection_id=1)
+
+    assert response.success == False
+    assert response.message == "Unable to create, user or collection cannot be 0"
 
 
 def test_delete_note(note_repo):
