@@ -6,8 +6,10 @@ from dotenv import load_dotenv
 from email_validator import validate_email, EmailNotValidError
 
 from .. import oauth
-from ..repositories.user_repo import user_repo
+
 from ..repositories.collection_repo import collection_repo
+
+from ..services.user_service import user_service
 
 auth = Blueprint("auth", __name__)
 DEFAULT_COLLECTION = "Default Collection"
@@ -36,7 +38,7 @@ def login():
             flash("Password must be greater than 6 characters", category="error")
             return render_template("login.html", user=current_user)
         else:
-            response = user_repo.get_by_email(email=email)
+            response = user_service.get_by_email(email=email)
 
             if not response.success:
                 flash("User does not exist!", category="error")
@@ -80,7 +82,7 @@ def demo_login():
 
     email = getenv("DEMO_USERNAME")
 
-    response = user_repo.get_by_email(email=email)
+    response = user_service.get_by_email(email=email)
 
     if not response.success:
         flash(
@@ -119,20 +121,20 @@ def sign_up():
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
 
-        response = user_repo.get_by_email(email=email)
+        response = user_service.get_by_email(email=email)
 
         if response.success:
             flash("User already exist!", category="error")
 
             return render_template("sign_up.html", user=current_user)
 
-        try:
-            emailObject = validate_email(email)
+        # try:
+        #     emailObject = validate_email(email)
 
-            email = emailObject.normalized
-        except EmailNotValidError as errorMsg:
-            flash(str(errorMsg), category="error")
-            return render_template("sign_up.html", user=current_user)
+        #     email = emailObject.normalized
+        # except EmailNotValidError as errorMsg:
+        #     flash(str(errorMsg), category="error")
+        #     return render_template("sign_up.html", user=current_user)
 
         if len(first_name) < 2:
             flash("First name must be greater than 1 character", category="error")
@@ -144,7 +146,7 @@ def sign_up():
             flash("Password and Confirm Password must match", category="error")
             return render_template("sign_up.html", user=current_user)
         else:
-            response = user_repo.create_user(
+            response = user_service.create_user(
                 email=email, first_name=first_name, password=password1
             )
 
@@ -192,7 +194,7 @@ def callback_url():
     user_info = session["user"].get("userinfo")
     email = user_info.get("email")
 
-    response = user_repo.get_by_email(email=email)
+    response = user_service.get_by_email(email=email)
 
     if response.success:
         user = response.body
@@ -209,7 +211,7 @@ def callback_url():
 
         return redirect(url_for("notes.my_notes", collection_id=default_collection.id))
 
-    response = user_repo.create_user(
+    response = user_service.create_user(
         first_name=user_info.get("given_name"), email=email
     )
 

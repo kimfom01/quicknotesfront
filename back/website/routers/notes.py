@@ -3,7 +3,7 @@ from flask import Blueprint, request, render_template, jsonify, flash, redirect,
 from flask_login import login_required, current_user
 
 
-from ..repositories.notes_repo import notes_repo
+from ..services.note_service import note_service
 from ..repositories.collection_repo import collection_repo
 
 
@@ -19,7 +19,7 @@ def my_notes():
 
     collection_id = request.args.get("collection_id")
 
-    response = notes_repo.get_all(collection_id)
+    response = note_service.get_all(collection_id)
 
     return render_template("my_notes.html", user=current_user, notes=response.body)
 
@@ -56,13 +56,7 @@ def new_note():
         data = request.form.get("note")
         collection_id: int = request.form.get("collection_id")
 
-        if len(data) < 1:
-            flash("Note is too short", category="error")
-            return render_template(
-                "new_note.html", user=current_user, collections=collections
-            )
-
-        response = notes_repo.create_note(
+        response = note_service.create_note(
             data=data, user_id=current_user.id, collection_id=collection_id
         )
 
@@ -87,7 +81,7 @@ def delete_note():
     note_id = data["noteId"]
     collection_id = data["collectionId"]
 
-    response = notes_repo.delete_note(note_id=note_id, collection_id=collection_id)
+    response = note_service.delete_note(note_id=note_id, collection_id=collection_id)
 
     if response.success:
         return jsonify({"message": response.message}), 204
