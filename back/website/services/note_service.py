@@ -61,6 +61,23 @@ class NoteService:
                 body=None,
             )
 
+    def update_note(
+        self, data: str, note_id: int, user_id: int, collection_id: int
+    ) -> Response:
+        try:
+            if note_id <= 0 or user_id <= 0 or collection_id <= 0:
+                raise Exception(
+                    "Unable to update, note id, user_id or collection id cannot be less than or equal to 0"
+                )
+
+            self.notes_repo.update_note(
+                data=data, note_id=note_id, user_id=user_id, collection_id=collection_id
+            )
+
+            return Response(success=True, message="Successfully updated", body=None)
+        except Exception as ex:
+            return Response(success=False, message=str(ex), body=None)
+
     def delete_note(self, note_id: int, collection_id: int) -> Response:
         try:
             if note_id <= 0 or collection_id <= 0:

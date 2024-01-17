@@ -28,6 +28,20 @@ class NotesRepo:
 
         return note
 
+    def update_note(
+        self, data: str, note_id: int, user_id: int, collection_id: int
+    ) -> None:
+        note = Note.query.filter_by(
+            id=note_id, collection_id=collection_id, user_id=user_id
+        ).first()
+
+        if note is None:
+            raise Exception("Note you are trying to update does not exist")
+
+        note.data = data
+        db.session.commit()
+
+    # TODO: Add user id to delete note parameters to avoid deleting note that does not belong to current user
     def delete_note(self, note_id: int, collection_id: int) -> None:
         note = Note.query.filter_by(id=note_id, collection_id=collection_id).first()
 
