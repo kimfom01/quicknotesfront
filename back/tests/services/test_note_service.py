@@ -196,7 +196,7 @@ def test_update_note_collection_id_invalid(note_repo):
 def test_delete_note(note_repo):
     note_service = NoteService(note_repo)
 
-    response = note_service.delete_note(note_id=1, collection_id=1)
+    response = note_service.delete_note(note_id=1, user_id=1, collection_id=1)
 
     assert response.success == True
     assert response.message == "Successfully deleted"
@@ -204,31 +204,31 @@ def test_delete_note(note_repo):
 
 def test_delete_note_collection_id_invalid(note_repo):
     note_repo.delete_note.side_effect = Exception(
-        "Unable to delete, note id or collection id cannot be less than or equal to 0"
+        "Unable to delete, note id, user id or collection id cannot be less than or equal to 0"
     )
 
     note_service = NoteService(note_repo)
 
-    response = note_service.delete_note(note_id=1, collection_id=0)
+    response = note_service.delete_note(note_id=1, user_id=1, collection_id=0)
 
     assert response.success == False
     assert (
         response.message
-        == "Unable to delete, note id or collection id cannot be less than or equal to 0"
+        == "Unable to delete, note id, user id or collection id cannot be less than or equal to 0"
     )
 
 
 def test_delete_note_note_id_invalid(note_repo):
     note_repo.delete_note.side_effect = Exception(
-        "Unable to delete, note id or collection id cannot be less than or equal to 0"
+        "Unable to delete, note id, user id or collection id cannot be less than or equal to 0"
     )
 
     note_service = NoteService(note_repo)
 
-    response = note_service.delete_note(note_id=0, collection_id=1)
+    response = note_service.delete_note(note_id=0, user_id=1, collection_id=1)
 
     assert response.success == False
     assert (
         response.message
-        == "Unable to delete, note id or collection id cannot be less than or equal to 0"
+        == "Unable to delete, note id, user id or collection id cannot be less than or equal to 0"
     )

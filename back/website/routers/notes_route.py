@@ -84,7 +84,9 @@ def delete_note():
     note_id = data["noteId"]
     collection_id = data["collectionId"]
 
-    response = note_service.delete_note(note_id=note_id, collection_id=collection_id)
+    response = note_service.delete_note(
+        note_id=note_id, user_id=current_user.id, collection_id=collection_id
+    )
 
     if response.success:
         return jsonify({"message": response.message}), 204

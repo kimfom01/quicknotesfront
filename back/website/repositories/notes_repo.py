@@ -41,18 +41,16 @@ class NotesRepo:
         note.data = data
         db.session.commit()
 
-    # TODO: Add user id to delete note parameters to avoid deleting note that does not belong to current user
-    def delete_note(self, note_id: int, collection_id: int) -> None:
-        note = Note.query.filter_by(id=note_id, collection_id=collection_id).first()
+    def delete_note(self, note_id: int, user_id: int, collection_id: int) -> None:
+        note = Note.query.filter_by(
+            id=note_id, collection_id=collection_id, user_id=user_id
+        ).first()
 
         if note is None:
-            return Response(success=False, message="Note not found", body=None)
+            raise Exception("Note you are trying to delete does not exist")
 
-        try:
-            note.deleted = True
-            db.session.commit()
-        except:
-            raise Exception("Unable to delete")
+        note.deleted = True
+        db.session.commit()
 
 
 notes_repo = NotesRepo()
