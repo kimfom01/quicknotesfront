@@ -7,29 +7,31 @@ class NoteService:
     def __init__(self, notes_repo: NotesRepo) -> None:
         self.notes_repo = notes_repo
 
-    def get_by_id(self, id: int, collection_id: int) -> Response:
-        if id <= 0 or collection_id <= 0:
+    def get_by_id(self, id: int, user_id: int, collection_id: int) -> Response:
+        if id <= 0 or user_id <= 0 or collection_id <= 0:
             return Response(
                 success=False,
-                message="Id or Collection id cannot be less than or equal to 0",
+                message="Id, user id or Collection id cannot be less than or equal to 0",
                 body=None,
             )
 
-        note = self.notes_repo.get_by_id(id=id, collection_id=collection_id)
+        note = self.notes_repo.get_by_id(
+            id=id, collection_id=collection_id, user_id=user_id
+        )
 
         if note is None:
             return Response(success=False, message="Note not found", body=None)
         return Response(success=True, message="Success", body=note)
 
-    def get_all(self, collection_id: int) -> Response:
-        if collection_id <= 0:
+    def get_all(self, user_id: int, collection_id: int) -> Response:
+        if user_id <= 0 or collection_id <= 0:
             return Response(
                 success=False,
-                message="Collection id cannot be less than or equal to 0",
+                message="User id or collection id cannot be less than or equal to 0",
                 body=None,
             )
 
-        notes = self.notes_repo.get_all(collection_id=collection_id)
+        notes = self.notes_repo.get_all(collection_id=collection_id, user_id=user_id)
 
         if notes is None:
             return Response(success=False, message="Notes not found", body=None)
@@ -50,7 +52,7 @@ class NoteService:
                 )
 
             note = self.notes_repo.create_note(
-                data=data, user_id=user_id, collection_id=collection_id
+                data=data.strip(), user_id=user_id, collection_id=collection_id
             )
 
             return Response(success=True, message="Successfully created", body=note)
@@ -71,7 +73,10 @@ class NoteService:
                 )
 
             self.notes_repo.update_note(
-                data=data, note_id=note_id, user_id=user_id, collection_id=collection_id
+                data=data.strip(),
+                note_id=note_id,
+                user_id=user_id,
+                collection_id=collection_id,
             )
 
             return Response(success=True, message="Successfully updated", body=None)

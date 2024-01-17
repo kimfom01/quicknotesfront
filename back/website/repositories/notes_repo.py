@@ -3,16 +3,19 @@ from typing import List
 
 from ..models.Collection import Collection
 from ..models.Note import Note
-from ..schema.Response import Response
 from .. import db
 
 
 class NotesRepo:
-    def get_by_id(self, id: int, collection_id: int) -> Note:
-        return Note.query.filter_by(collection_id=collection_id, id=id).first()
+    def get_by_id(self, id: int, user_id: int, collection_id: int) -> Note:
+        return Note.query.filter_by(
+            collection_id=collection_id, id=id, user_id=user_id
+        ).first()
 
-    def get_all(self, collection_id: int) -> List[Note]:
-        return Note.query.filter_by(collection_id=collection_id, deleted=False).all()
+    def get_all(self, user_id: int, collection_id: int) -> List[Note]:
+        return Note.query.filter_by(
+            collection_id=collection_id, deleted=False, user_id=user_id
+        ).all()
 
     def get_collections(self, user_id: int) -> List[Collection]:
         return Collection.query.filter_by(user_id=user_id).all()

@@ -17,7 +17,7 @@ def note_repo():
 def test_get_by_id_valid(note_repo):
     note_service = NoteService(note_repo)
 
-    response = note_service.get_by_id(id=1, collection_id=1)
+    response = note_service.get_by_id(id=1, collection_id=1, user_id=1)
 
     assert response.success == True
     assert response.message == "Success"
@@ -26,52 +26,93 @@ def test_get_by_id_valid(note_repo):
 def test_get_by_id_collection_id_invalid(note_repo):
     note_repo.get_by_id.return_value = Response(
         success=False,
-        message="Id or Collection id cannot be less than or equal to 0",
+        message="Id, user id or Collection id cannot be less than or equal to 0",
         body=None,
     )
     note_service = NoteService(note_repo)
 
-    response = note_service.get_by_id(id=1, collection_id=0)
+    response = note_service.get_by_id(id=1, collection_id=0, user_id=1)
 
     assert response.success == False
-    assert response.message == "Id or Collection id cannot be less than or equal to 0"
+    assert (
+        response.message
+        == "Id, user id or Collection id cannot be less than or equal to 0"
+    )
+
+
+def test_get_by_id_user_id_invalid(note_repo):
+    note_repo.get_by_id.return_value = Response(
+        success=False,
+        message="Id, user id or Collection id cannot be less than or equal to 0",
+        body=None,
+    )
+    note_service = NoteService(note_repo)
+
+    response = note_service.get_by_id(id=1, collection_id=1, user_id=0)
+
+    assert response.success == False
+    assert (
+        response.message
+        == "Id, user id or Collection id cannot be less than or equal to 0"
+    )
 
 
 def test_get_by_id_note_id_invalid(note_repo):
     note_repo.get_by_id.return_value = Response(
         success=False,
-        message="Id or Collection id cannot be less than or equal to 0",
+        message="Id, user id or Collection id cannot be less than or equal to 0",
         body=None,
     )
     note_service = NoteService(note_repo)
 
-    response = note_service.get_by_id(id=0, collection_id=1)
+    response = note_service.get_by_id(id=0, collection_id=1, user_id=1)
 
     assert response.success == False
-    assert response.message == "Id or Collection id cannot be less than or equal to 0"
+    assert (
+        response.message
+        == "Id, user id or Collection id cannot be less than or equal to 0"
+    )
 
 
 def test_get_all_valid(note_repo):
     note_service = NoteService(note_repo)
 
-    response = note_service.get_all(collection_id=1)
+    response = note_service.get_all(collection_id=1, user_id=1)
 
     assert response.success == True
     assert response.message == "Success"
 
 
-def test_get_all_invalid(note_repo):
+def test_get_all_collection_id_invalid(note_repo):
     note_repo.get_all.return_value = Response(
         success=False,
-        message="Collection id cannot be less than or equal to 0",
+        message="User id or collection id cannot be less than or equal to 0",
         body=None,
     )
     note_service = NoteService(note_repo)
 
-    response = note_service.get_all(collection_id=0)
+    response = note_service.get_all(collection_id=0, user_id=1)
 
     assert response.success == False
-    assert response.message == "Collection id cannot be less than or equal to 0"
+    assert (
+        response.message == "User id or collection id cannot be less than or equal to 0"
+    )
+
+
+def test_get_all_user_id_invalid(note_repo):
+    note_repo.get_all.return_value = Response(
+        success=False,
+        message="User id or collection id cannot be less than or equal to 0",
+        body=None,
+    )
+    note_service = NoteService(note_repo)
+
+    response = note_service.get_all(collection_id=1, user_id=0)
+
+    assert response.success == False
+    assert (
+        response.message == "User id or collection id cannot be less than or equal to 0"
+    )
 
 
 def test_create_note_valid(note_repo):
