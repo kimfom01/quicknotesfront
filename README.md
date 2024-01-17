@@ -110,30 +110,10 @@ Contributors names and contact info
 
 This project is licensed under the [LICENSE NAME] License - see the LICENSE.md file for details -->
 
-## Acknowledgments
+<!-- ## Acknowledgments
 
 Give credit to any resources or individuals that helped in the development of this project.
 
 - [Awesome README](https://github.com/matiassingers/awesome-readme)
 - [Markdown Syntax Guide](https://www.markdownguide.org/basic-syntax/)
-- [Choose an Open Source License](https://choosealicense.com/)
-
-<!--
-
-## Some dependencies
-
-- flask
-- Flask-SQLAlchemy
-- flask-login
-- Authlib
-- requests
-- Gunicorn
-
-## Run Migrations
-
-```sh
-flask db init
-flask db migrate
-flask db upgrade
-```
- -->
+- [Choose an Open Source License](https://choosealicense.com/) -->
