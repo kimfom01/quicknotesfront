@@ -193,6 +193,21 @@ def test_update_note_collection_id_invalid(note_repo):
     )
 
 
+def test_update_note_not_found_invalid(note_repo):
+    note_repo.update_note.side_effect = Exception(
+        "Note you are trying to update does not exist"
+    )
+
+    note_service = NoteService(note_repo)
+
+    response = note_service.update_note(
+        data="test update data", note_id=1, user_id=1, collection_id=1
+    )
+
+    assert response.success == False
+    assert response.message == "Note you are trying to update does not exist"
+
+
 def test_delete_note(note_repo):
     note_service = NoteService(note_repo)
 
@@ -232,3 +247,32 @@ def test_delete_note_note_id_invalid(note_repo):
         response.message
         == "Unable to delete, note id, user id or collection id cannot be less than or equal to 0"
     )
+
+
+def test_delete_note_user_id_invalid(note_repo):
+    note_repo.delete_note.side_effect = Exception(
+        "Unable to delete, note id, user id or collection id cannot be less than or equal to 0"
+    )
+
+    note_service = NoteService(note_repo)
+
+    response = note_service.delete_note(note_id=1, user_id=0, collection_id=1)
+
+    assert response.success == False
+    assert (
+        response.message
+        == "Unable to delete, note id, user id or collection id cannot be less than or equal to 0"
+    )
+
+
+def test_delete_note_not_found_invalid(note_repo):
+    note_repo.delete_note.side_effect = Exception(
+        "Note you are trying to delete does not exist"
+    )
+
+    note_service = NoteService(note_repo)
+
+    response = note_service.delete_note(note_id=1, user_id=1, collection_id=1)
+
+    assert response.success == False
+    assert response.message == "Note you are trying to delete does not exist"
