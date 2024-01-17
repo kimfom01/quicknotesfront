@@ -3,15 +3,24 @@ content %}
 <h1 align="center" class="mt-5">{{ user.first_name }}'s Notes</h1>
 <ul class="list-group list-group-flush" id="notes">
   {% for note in notes %}
-  <li class="list-group-item">
+  <li class="list-group-item d-flex justify-content-between">
     <div class="wrap-text">{{ note.data }}</div>
-    <button
-      type="button"
-      class="close"
-      onClick="deleteNote({{ note.id }}, {{note.collection_id}})"
-    >
-      <span aria-hidden="true">&times;</span>
-    </button>
+    <div class="d-flex flex-column buttons">
+      <a
+        type="button"
+        class="btn btn-dark float"
+        href="{{ url_for('notes.update_note', collection_id=note.collection_id, note_id=note.id) }}"
+      >
+        Edit
+      </a>
+      <button
+        type="button"
+        class="btn btn-danger float"
+        onClick="deleteNote({{ note.id }}, {{note.collection_id}})"
+      >
+        Delete
+      </button>
+    </div>
   </li>
   {% endfor %}
 </ul>
