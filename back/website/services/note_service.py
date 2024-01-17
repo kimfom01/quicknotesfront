@@ -1,6 +1,6 @@
-from website.repositories import notes_repo
-from website.schema.Response import Response
-from website.repositories.notes_repo import NotesRepo, notes_repo
+from ..repositories import notes_repo
+from ..schema.Response import Response
+from ..repositories.notes_repo import NotesRepo, notes_repo
 
 
 class NoteService:

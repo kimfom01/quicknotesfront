@@ -1,8 +1,10 @@
+import pytest
+from unittest import mock
+
+
 from website.schema.Response import Response
 from website.services.note_service import NoteService
 from website.repositories.notes_repo import NotesRepo
-import pytest
-from unittest import mock
 
 
 @pytest.fixture

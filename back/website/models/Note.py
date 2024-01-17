@@ -1,8 +1,8 @@
 from sqlalchemy import TIMESTAMP
-from .. import db
-
-
 from sqlalchemy.sql import func
+
+
+from .. import db
 
 
 class Note(db.Model):

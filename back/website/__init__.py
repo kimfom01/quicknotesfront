@@ -39,9 +39,9 @@ def create_app():
 
     db.init_app(app)
 
-    from .routers.views import views
-    from .routers.auth import auth
-    from .routers.notes import notes
+    from .routers.views_route import views
+    from .routers.auth_route import auth
+    from .routers.notes_route import notes
 
     app.register_blueprint(views, url_prefix="/")
     app.register_blueprint(auth, url_prefix="/")

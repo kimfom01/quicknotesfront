@@ -1,8 +1,10 @@
-from website.services.user_service import UserService, user_service
-from website.repositories.collection_repo import CollectionRepo, collection_repo
 from website.schema.Response import Response
 from flask_login import login_user
 from werkzeug.security import check_password_hash
+
+
+from ..services.user_service import UserService, user_service
+from ..repositories.collection_repo import CollectionRepo, collection_repo
 
 
 class AuthService:
