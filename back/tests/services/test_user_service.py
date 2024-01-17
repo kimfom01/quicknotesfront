@@ -1,7 +1,9 @@
-from website.services.user_service import UserService
-from website.repositories.user_repo import UserRepo
 import pytest
 from unittest import mock
+
+
+from website.services.user_service import UserService
+from website.repositories.user_repo import UserRepo
 
 
 @pytest.fixture

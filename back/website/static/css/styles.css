@@ -67,6 +67,10 @@ body {
   white-space: pre-wrap;
 }
 
+div.buttons {
+  position: relative;
+}
+
 @media (max-width: 700px) {
   .landing-message {
     font-size: 60px;

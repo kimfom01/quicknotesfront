@@ -1,13 +1,14 @@
-{% extends "base.html" %} {% block title %} New Note {% endblock %} {% block
+{% extends "base.html" %} {% block title %} Edit Note {% endblock %} {% block
 content %}
 <div align="center" class="m-sm-3 m-md-5">
   <div class="col-lg-8">
     <div align="left" class="card">
       <div class="card-body">
         <div class="card-title">
-          <h3 class="text-center">New Note</h3>
+          <h3 class="text-center">Edit Note</h3>
         </div>
         <form method="post">
+          <input hidden name="note_id" value="{{note.id}}" />
           <div class="form-group mb-3">
             <textarea
               id="note"
@@ -15,7 +16,9 @@ content %}
               name="note"
               rows="10"
               class="form-control"
-            ></textarea>
+            >
+{{note.data.strip()}}
+            </textarea>
           </div>
           <div class="d-flex justify-content-between">
             <select name="collection_id" required>

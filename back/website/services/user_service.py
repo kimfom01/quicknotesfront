@@ -1,6 +1,8 @@
-from website.repositories.user_repo import UserRepo, user_repo
-from ..schema.Response import Response
 from email_validator import validate_email, EmailNotValidError
+
+
+from ..repositories.user_repo import UserRepo, user_repo
+from ..schema.Response import Response
 
 
 class UserService:

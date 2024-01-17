@@ -1,8 +1,8 @@
 from sqlalchemy import TIMESTAMP
-from .. import db
-
-
 from sqlalchemy.sql import func
+
+
+from .. import db
 
 
 class Note(db.Model):
@@ -25,7 +25,7 @@ class Note(db.Model):
     collection_id = db.Column(db.Integer, db.ForeignKey("collections.id"))
 
     def __repr__(self):
-        return f"User {self.id}: {self.email}"
+        return f"Note {self.id}: User {self.user_id}"
 
     def __eq__(self, other):
         if isinstance(other, Note):
