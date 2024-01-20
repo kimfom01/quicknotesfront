@@ -13,9 +13,9 @@ class UserService:
 
     def get_by_email(self, email: str) -> Response:
         try:
-            emailObject = validate_email(email)
+            email_object = validate_email(email)
 
-            email = emailObject.normalized
+            email = email_object.normalized
 
             user = self.user_repo.get_by_email(email=email)
 
@@ -27,20 +27,27 @@ class UserService:
         except EmailNotValidError as errorMsg:
             return Response(success=False, message=str(errorMsg), body=None)
 
-    def create_user(self, email: str, first_name: str, password: str) -> Response:
+    def create_user(
+        self, email: str, first_name: str, password: str | None, google: bool = False
+    ) -> Response:
         try:
             if len(first_name) <= 1:
                 raise Exception("First name must be greater than 1 character")
-            elif len(password) <= 6:
+            elif not google and len(password) <= 6:
                 raise Exception("Password must be greater than 6 characters")
 
-            emailObject = validate_email(email)
+            email_object = validate_email(email)
 
-            email = emailObject.normalized
+            email = email_object.normalized
 
-            user = self.user_repo.create_user(
-                email=email, first_name=first_name, password=password
-            )
+            if google:
+                user = self.user_repo.create_google_user(
+                    email=email, first_name=first_name,
+                )
+            else:
+                user = self.user_repo.create_user(
+                    email=email, first_name=first_name, password=password
+                )
 
             self.collection_repo.create_default_collection(user_id=user.id)
             return Response(success=True, message="Successfully registered", body=user)
