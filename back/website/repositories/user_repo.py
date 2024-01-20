@@ -1,5 +1,6 @@
-from ..models.User import User
 from werkzeug.security import generate_password_hash
+
+from ..models.User import User
 from .. import db
 
 
@@ -17,5 +18,13 @@ class UserRepo:
 
         return user
 
+    def create_google_user(self, email: str, first_name: str) -> User:
+        user = User(email=email, first_name=first_name)
+
+        db.session.add(user)
+        db.session.commit()
+        db.session.refresh(user)
+
+        return user
 
 user_repo = UserRepo()
