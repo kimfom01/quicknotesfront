@@ -16,7 +16,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(100), unique=True)
     email = db.Column(db.String(150), unique=True, nullable=False)
-    password = db.Column(db.String(150))
+    password = db.Column(db.String(150), nullable=True)
     created_at = db.Column(
         TIMESTAMP(timezone=True),
         nullable=False,
