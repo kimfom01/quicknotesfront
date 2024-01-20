@@ -1,8 +1,7 @@
-from website.schema.Response import Response
 from flask_login import login_user
 from werkzeug.security import check_password_hash
 
-
+from ..schema.Response import Response
 from ..services.user_service import UserService, user_service
 from ..repositories.collection_repo import CollectionRepo, collection_repo
 
@@ -14,8 +13,10 @@ class AuthService:
         self.collection_repo = collection_repo
         self.user_service = user_service
 
-    def login_user(self, email: str, password: str) -> Response:
-        if len(password) < 7:
+    def login_user(
+        self, email: str, password: str | None = None, demo: bool = False
+    ) -> Response:
+        if password and len(password) < 7:
             return Response(
                 success=False,
                 message="Password must be greater than 6 characters",
@@ -43,6 +44,14 @@ class AuthService:
                     body=None,
                 )
 
+            if demo:
+                login_user(user, remember=True)
+                return Response(
+                    success=True,
+                    message="Demo logged in successfully!",
+                    body=default_collection,
+                )
+
             if check_password_hash(user.password, password):
                 login_user(user, remember=True)
                 return Response(
@@ -56,8 +65,35 @@ class AuthService:
                 body=None,
             )
 
-    def sign_up_user():
-        pass
+    def sign_up_user(
+        self,
+        first_name: str,
+        email: str,
+        password: str | None = None,
+        google: bool = False,
+    ) -> Response:
+        response = self.user_service.get_by_email(email=email)
+        if response.success:
+            if google:
+                user = response.body
+                login_user(user)
+                return Response(
+                    success=True, message="Logged in successfully!", body=user
+                )
+            else:
+                return Response(success=False, message="User already exist!", body=None)
+
+        response = self.user_service.create_user(
+            email=email, password=password, first_name=first_name, google=google
+        )
+
+        if not response.success:
+            return Response(success=False, message=response.message, body=None)
+
+        user = response.body
+        login_user(user)
+
+        return Response(success=True, message=response.message, body=user)
 
 
 auth_service = AuthService(collection_repo, user_service)
