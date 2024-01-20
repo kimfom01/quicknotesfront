@@ -39,12 +39,9 @@ class NoteService:
 
     def create_note(self, data: str, user_id: int, collection_id: int) -> Response:
         try:
+            data = data.strip()
             if len(data) < 1:
-                return Response(
-                    success=False,
-                    message="Unable to create, data is invalid",
-                    body=None,
-                )
+                raise Exception("Unable to create, data is invalid")
 
             if user_id <= 0 or collection_id <= 0:
                 raise Exception(
@@ -52,7 +49,7 @@ class NoteService:
                 )
 
             note = self.notes_repo.create_note(
-                data=data.strip(), user_id=user_id, collection_id=collection_id
+                data=data, user_id=user_id, collection_id=collection_id
             )
 
             return Response(success=True, message="Successfully created", body=note)
