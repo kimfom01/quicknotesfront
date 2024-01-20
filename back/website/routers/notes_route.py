@@ -5,6 +5,7 @@ from flask_login import login_required, current_user
 
 from ..services.note_service import note_service
 from ..repositories.collection_repo import collection_repo
+from ..services.collection_service import collection_service
 
 
 notes = Blueprint("notes", __name__)
@@ -36,7 +37,7 @@ def my_collections():
     Show collections
     """
 
-    response = collection_repo.get_collections(user_id=current_user.id)
+    response = collection_service.get_collections(user_id=current_user.id)
 
     return render_template(
         "my_collections.html", user=current_user, collection=response.body
