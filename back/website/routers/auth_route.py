@@ -1,11 +1,11 @@
 from os import getenv
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session
-from flask_login import login_user, login_required, logout_user, current_user
+from flask_login import login_required, logout_user, current_user
 from dotenv import load_dotenv
 
 from ..services.auth_service import auth_service
 from .. import oauth
-from ..repositories.collection_repo import collection_repo
+from ..services.collection_service import collection_service
 from ..services.user_service import user_service
 
 auth = Blueprint("auth", __name__)
@@ -43,7 +43,7 @@ def demo_login():
 
     email = getenv("DEMO_USERNAME")
 
-    response = user_service.get_by_email(email=email)
+    response = auth_service.login_user(email=email)
 
     if not response.success:
         flash(
@@ -52,10 +52,7 @@ def demo_login():
         )
         return render_template("login.html", user=current_user)
 
-    user = response.body
-
-    flash("Logged in successfully!", category="success")
-    login_user(user, remember=False)
+    flash(response.message, category="success")
     return redirect(url_for("notes.my_collections"))
 
 
@@ -82,38 +79,33 @@ def sign_up():
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
 
-        response = user_service.get_by_email(email=email)
-
-        if response.success:
-            flash("User already exist!", category="error")
-
-            return render_template("sign_up.html", user=current_user)
-
         if password1 != password2:
             flash("Password and Confirm Password must match", category="error")
             return render_template("sign_up.html", user=current_user)
         else:
-            response = user_service.create_user(
+            response = auth_service.sign_up_user(
                 email=email, first_name=first_name, password=password1
             )
 
-            if response.success:
-                user = response.body
-
-                response = collection_repo.create_collection(
-                    title=DEFAULT_COLLECTION, user_id=user.id
-                )
-
-                if not response.success:
-                    flash("Account created but no default category", category="error")
-                else:
-                    flash("Account created!", category="success")
-
-                login_user(user)
-
-                return redirect(url_for("notes.my_notes"))
-            else:
+            if not response.success:
                 flash(response.message, category="error")
+                return render_template("sign_up.html", user=current_user)
+
+            flash(response.message, category="success")
+
+            user = response.body
+
+            coll_response = collection_service.get_default_collection(user_id=user.id)
+
+            if not coll_response.success:
+                flash(coll_response.message, category="error")
+                return redirect(url_for("auth.login"))
+
+            default_collection = coll_response.body
+
+            return redirect(
+                url_for("notes.my_notes", collection_id=default_collection.id)
+            )
 
     return render_template("sign_up.html", user=current_user)
 
@@ -121,7 +113,7 @@ def sign_up():
 @auth.route("/google-signin")
 def google_signin():
     """
-    Redirect to google sso
+    Redirect to Google sso
 
     Return: redirects to callback function
     """
@@ -132,8 +124,8 @@ def google_signin():
 
 @auth.route("/authCallback")
 def callback_url():
-    """sumary_line
-    Gets the token from google oauth and log in the
+    """summary_line
+    Gets the token from Google oauth and log in the
     user or create a new user if user doesn't have an account
 
     Return: redirects to the user's notes
@@ -143,39 +135,24 @@ def callback_url():
     user_info = session["user"].get("userinfo")
     email = user_info.get("email")
 
-    response = user_service.get_by_email(email=email)
+    response = auth_service.sign_up_user(
+        email=email, first_name=user_info.get("given_name"), google=True
+    )
 
     if response.success:
         user = response.body
-        login_user(user)
         flash("Logged in successfully!", category="success")
 
-        response = collection_repo.get_default_collection(user_id=user.id)
+        response = collection_service.get_default_collection(user_id=user.id)
 
         if not response.success:
             flash(response.message, category="error")
-            return
+            return redirect(url_for("auth.login"))
 
         default_collection = response.body
 
         return redirect(url_for("notes.my_notes", collection_id=default_collection.id))
 
-    response = user_service.create_user(
-        first_name=user_info.get("given_name"), email=email
-    )
+    flash(response.message, category="error")
 
-    if response.success:
-        user = response.body
-        response = collection_repo.create_collection(
-            title=DEFAULT_COLLECTION, user_id=user.id
-        )
-
-        if not response.success:
-            flash("Account created but no default category", category="error")
-        else:
-            flash("Account created!", category="success")
-        login_user(user)
-        return redirect(url_for("notes.my_notes"))
-
-    flash("Something wen't wrong during google login", category="error")
     return redirect(url_for("auth.login"))

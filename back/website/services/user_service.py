@@ -2,18 +2,20 @@ from email_validator import validate_email, EmailNotValidError
 
 
 from ..repositories.user_repo import UserRepo, user_repo
+from ..services.collection_service import CollectionRepo, collection_repo
 from ..schema.Response import Response
 
 
 class UserService:
-    def __init__(self, user_repo: UserRepo) -> None:
+    def __init__(self, user_repo: UserRepo, collection_repo: CollectionRepo) -> None:
         self.user_repo = user_repo
+        self.collection_repo = collection_repo
 
     def get_by_email(self, email: str) -> Response:
         try:
-            emailObject = validate_email(email)
+            email_object = validate_email(email)
 
-            email = emailObject.normalized
+            email = email_object.normalized
 
             user = self.user_repo.get_by_email(email=email)
 
@@ -25,32 +27,34 @@ class UserService:
         except EmailNotValidError as errorMsg:
             return Response(success=False, message=str(errorMsg), body=None)
 
-    def create_user(self, email: str, first_name: str, password: str) -> Response:
-        if len(first_name) <= 1:
-            return Response(
-                success=False,
-                message="First name must be greater than 1 character",
-                body=None,
-            )
-        elif len(password) <= 6:
-            return Response(
-                success=False,
-                message="Password must be greater than 6 characters",
-                body=None,
-            )
+    def create_user(
+        self, email: str, first_name: str, password: str | None, google: bool = False
+    ) -> Response:
         try:
-            emailObject = validate_email(email)
+            if len(first_name) <= 1:
+                raise Exception("First name must be greater than 1 character")
+            elif not google and len(password) <= 6:
+                raise Exception("Password must be greater than 6 characters")
 
-            email = emailObject.normalized
+            email_object = validate_email(email)
 
-            user = self.user_repo.create_user(
-                email=email, first_name=first_name, password=password
-            )
-            return Response(success=True, message="Successfully created", body=user)
+            email = email_object.normalized
+
+            if google:
+                user = self.user_repo.create_google_user(
+                    email=email, first_name=first_name,
+                )
+            else:
+                user = self.user_repo.create_user(
+                    email=email, first_name=first_name, password=password
+                )
+
+            self.collection_repo.create_default_collection(user_id=user.id)
+            return Response(success=True, message="Successfully registered", body=user)
         except EmailNotValidError as errorMsg:
             return Response(success=False, message=str(errorMsg), body=None)
-        except:
-            return Response(success=False, message="Unable to create", body=None)
+        except Exception as ex:
+            return Response(success=False, message=str(ex), body=None)
 
 
-user_service = UserService(user_repo)
+user_service = UserService(user_repo, collection_repo)

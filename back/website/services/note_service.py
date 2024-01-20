@@ -39,20 +39,17 @@ class NoteService:
 
     def create_note(self, data: str, user_id: int, collection_id: int) -> Response:
         try:
-            if len(data) < 1:
-                return Response(
-                    success=False,
-                    message="Unable to create, data is invalid",
-                    body=None,
-                )
+            data = data.strip()
+            if len(data) <= 0:
+                raise Exception("Note text cannot be empty")
 
             if user_id <= 0 or collection_id <= 0:
                 raise Exception(
-                    "Unable to create, user id or collection id cannot be less than or equal to 0"
+                    "User id or collection id cannot be less than or equal to 0"
                 )
 
             note = self.notes_repo.create_note(
-                data=data.strip(), user_id=user_id, collection_id=collection_id
+                data=data, user_id=user_id, collection_id=collection_id
             )
 
             return Response(success=True, message="Successfully created", body=note)
@@ -69,7 +66,7 @@ class NoteService:
         try:
             if note_id <= 0 or user_id <= 0 or collection_id <= 0:
                 raise Exception(
-                    "Unable to update, note id, user_id or collection id cannot be less than or equal to 0"
+                    "Note id, user_id or collection id cannot be less than or equal to 0"
                 )
 
             self.notes_repo.update_note(
@@ -87,7 +84,7 @@ class NoteService:
         try:
             if note_id <= 0 or user_id <= 0 or collection_id <= 0:
                 raise Exception(
-                    "Unable to delete, note id, user id or collection id cannot be less than or equal to 0"
+                    "Note id, user id or collection id cannot be less than or equal to 0"
                 )
 
             self.notes_repo.delete_note(
