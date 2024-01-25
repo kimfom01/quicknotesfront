@@ -4,7 +4,6 @@ from flask_login import login_required, current_user
 
 
 from ..services.note_service import note_service
-from ..repositories.collection_repo import collection_repo
 from ..services.collection_service import collection_service
 
 
@@ -51,7 +50,7 @@ def new_note():
     Create new note
     """
 
-    response = collection_repo.get_collections(user_id=current_user.id)
+    response = collection_service.get_collections(user_id=current_user.id)
     if not response.success:
         "Something went wrong, unable to get user's collections",
         return
@@ -87,7 +86,7 @@ def update_note():
         note_id = request.args.get("note_id")
         collection_id = request.args.get("collection_id")
 
-        response = collection_repo.get_collections(user_id=current_user.id)
+        response = collection_service.get_collections(user_id=current_user.id)
         if not response.success:
             flash(
                 "Something went wrong, unable to get user's collections",
