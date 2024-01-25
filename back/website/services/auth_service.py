@@ -3,14 +3,14 @@ from werkzeug.security import check_password_hash
 
 from ..schema.Response import Response
 from ..services.user_service import UserService, user_service
-from ..repositories.collection_repo import CollectionRepo, collection_repo
+from ..services.collection_service import CollectionService, collection_service
 
 
 class AuthService:
     def __init__(
-        self, collection_repo: CollectionRepo, user_service: UserService
+        self, collection_service: CollectionService, user_service: UserService
     ) -> None:
-        self.collection_repo = collection_repo
+        self.collection_service = collection_service
         self.user_service = user_service
 
     def login_user(
@@ -30,7 +30,7 @@ class AuthService:
 
             user = response.body
 
-            response = self.collection_repo.get_default_collection(user_id=user.id)
+            response = self.collection_service.get_default_collection(user_id=user.id)
 
             if not response.success:
                 return Response(success=False, message=response.message, body=None)
@@ -96,4 +96,4 @@ class AuthService:
         return Response(success=True, message=response.message, body=user)
 
 
-auth_service = AuthService(collection_repo, user_service)
+auth_service = AuthService(collection_service, user_service)

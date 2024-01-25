@@ -43,7 +43,7 @@ def demo_login():
 
     email = getenv("DEMO_USERNAME")
 
-    response = auth_service.login_user(email=email)
+    response = auth_service.login_user(email=email, demo=True)
 
     if not response.success:
         flash(
