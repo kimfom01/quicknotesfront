@@ -1,0 +1,7 @@
+.main-bg-render {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(45deg, #1889ac, #328c7f);
+  color: #fff;
+}
