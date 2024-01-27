@@ -5,9 +5,11 @@ import reportWebVitals from "./reportWebVitals";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { LandingPage } from "./components/LandingPage";
 import { Error404Page } from "./components/Error404Page";
-import { Login } from "./components/Login";
+import { SignIn } from "./components/SignIn";
 import { SignUp } from "./components/SignUp";
 import { NotesPage } from "./components/NotesPage";
+import { AboutUs } from "./components/AboutUs";
+import { HowItWorks } from "./components/HowItWorks";
 
 const router = createBrowserRouter([
   {
@@ -16,8 +18,8 @@ const router = createBrowserRouter([
     errorElement: <Error404Page />,
   },
   {
-    path: "/login",
-    element: <Login />,
+    path: "/signin",
+    element: <SignIn />,
     errorElement: <Error404Page />,
   },
   {
@@ -28,6 +30,16 @@ const router = createBrowserRouter([
   {
     path: "/notes",
     element: <NotesPage />,
+    errorElement: <Error404Page />,
+  },
+  {
+    path: "/about-us",
+    element: <AboutUs />,
+    errorElement: <Error404Page />,
+  },
+  {
+    path: "/how-it-works",
+    element: <HowItWorks />,
     errorElement: <Error404Page />,
   },
   { path: "*", element: <Error404Page /> },
