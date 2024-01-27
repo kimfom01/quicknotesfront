@@ -5,3 +5,15 @@
   background: linear-gradient(45deg, #1889ac, #328c7f);
   color: #fff;
 }
+
+.text-orange {
+  color: #f0b491;
+}
+
+span > hr {
+  width: 30%;
+  margin-top: 0;
+  margin-left: auto;
+  margin-right: auto;
+  height: 3px;
+}
