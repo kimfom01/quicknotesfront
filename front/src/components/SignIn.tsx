@@ -1,9 +1,9 @@
 import { Base } from "./Base";
 
-export const Login = () => {
+export const SignIn = () => {
   return (
     <Base>
-      <h2>Login</h2>
+      <h2>Sign In</h2>
     </Base>
   );
 };
