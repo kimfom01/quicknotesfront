@@ -1,6 +1,7 @@
 import { ReactElement, ReactNode } from "react";
 import "./Base.css";
-import { Container, Nav, Navbar } from "react-bootstrap";
+import logo from "../assets/logo-text.png";
+import { Container, Nav, Navbar, Image } from "react-bootstrap";
 
 interface Prop {
   children: ReactNode | ReactElement;
@@ -12,11 +13,11 @@ export const Base = ({ children }: Prop) => {
       <Container fluid className="mt-3">
         <Navbar collapseOnSelect expand="lg" variant="dark">
           <Navbar.Brand href="/" className="text-light fw-bold">
-            Quick Notes
+            <Image src={logo} alt="Logo text image" />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
-            <Nav className="ms-auto">
+            <Nav className="ms-auto fs-4">
               <span>
                 <Nav.Link className="text-orange" href="/">
                   Home
