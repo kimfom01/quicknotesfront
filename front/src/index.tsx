@@ -10,6 +10,7 @@ import { SignUp } from "./components/SignUp";
 import { NotesPage } from "./components/NotesPage";
 import { AboutUs } from "./components/AboutUs";
 import { HowItWorks } from "./components/HowItWorks";
+import NavBar from "./components/NavBar";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,11 @@ const router = createBrowserRouter([
   {
     path: "/how-it-works",
     element: <HowItWorks />,
+    errorElement: <Error404Page />,
+  },
+  {
+    path: "/nav-bar",
+    element: <NavBar />,
     errorElement: <Error404Page />,
   },
   { path: "*", element: <Error404Page /> },
