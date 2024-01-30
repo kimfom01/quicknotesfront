@@ -9,15 +9,15 @@ interface Prop {
 
 export const Base = ({ children }: Prop) => {
   return (
-    <main className="main-bg-render">
+    <main className="base">
       <Container fluid className="mt-3">
         <Navbar collapseOnSelect expand="lg" variant="dark">
           <Navbar.Brand href="/" className="text-light fw-bold">
-            <Image src={logo} alt="Logo text image" />
+            <Image className="left-padding" src={logo} alt="Logo text image" />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
-            <Nav className="ms-auto fs-4">
+            <Nav className="ms-auto fs-4 right-padding">
               <span>
                 <Nav.Link className="text-orange" href="/">
                   Home

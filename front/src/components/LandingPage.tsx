@@ -9,9 +9,9 @@ import "./LandingPage.css";
 export const LandingPage = () => {
   return (
     <Base>
-      <Stack className="flex-sm-column flex-md-row" gap={3}>
+      <Stack className="flex-sm-column flex-lg-row" gap={3}>
         <Stack className="hero-text" gap={4}>
-          <Image className="w-50" src={landing_text} alt="Landing text" />
+          <Image className="w-75" src={landing_text} alt="Landing text" />
           <Stack direction="horizontal" gap={3}>
             <Button
               as="a"
