@@ -12,7 +12,7 @@ export const Base = ({ children }: Prop) => {
         <div className="text-3xl font-MightyBrush">
           <Link to={"/"}>Quick Notes</Link>
         </div>
-        <nav className="flex gap-4">
+        <nav className="hidden md:flex gap-4">
           <Link to="/about-us">About Us</Link>
           <Link to={"/how-it-works"}>How it works</Link>
           <Link to={"/signin"}>Sign In</Link>
