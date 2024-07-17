@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "Mighty Brush";
+    src: url("./fonts/MightyBrush.woff2") format("woff2"),
+      url("./fonts/MightyBrush.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+}
